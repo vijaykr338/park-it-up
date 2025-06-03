@@ -21,7 +21,6 @@ export default function ParkItUpLanding() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Main text wipe-up animation
       if (mainTextRef.current) {
         gsap.fromTo(
           mainTextRef.current,
@@ -39,7 +38,6 @@ export default function ParkItUpLanding() {
         )
       }
 
-      // Hero section animations
       gsap.fromTo(
         ".hero-content > *:not(h1)",
         { y: 50, opacity: 0 },
@@ -53,7 +51,6 @@ export default function ParkItUpLanding() {
         },
       )
 
-      // Stats section scroll animation with timestamp
       ScrollTrigger.create({
         trigger: statsRef.current,
         start: "top 80%",
@@ -94,7 +91,6 @@ export default function ParkItUpLanding() {
         },
       })
 
-      // Floating animation for pricing badges
       gsap.to(".pricing-badge", {
         y: -10,
         duration: 2,
@@ -110,7 +106,7 @@ export default function ParkItUpLanding() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation */}
+      {/* Nav bar */}
       <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-blue-100">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -142,7 +138,6 @@ export default function ParkItUpLanding() {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <section ref={heroRef} className="hero-gradient pt-24 pb-16 min-h-screen flex items-center">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -197,7 +192,7 @@ export default function ParkItUpLanding() {
                   height={400}
                   className="w-full h-auto"
                 />
-                {/* Floating pricing badges */}
+
                 <div className="absolute top-20 right-20 pricing-badge">$2.1/h</div>
                 <div className="absolute top-40 left-16 pricing-badge">$3.2/h</div>
                 <div className="absolute bottom-32 right-32 pricing-badge">$2.0/h</div>
@@ -208,7 +203,6 @@ export default function ParkItUpLanding() {
         </div>
       </section>
 
-      {/* Stats Section */}
       <section ref={statsRef} className="stats-section py-16">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 items-center">
@@ -231,7 +225,6 @@ export default function ParkItUpLanding() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section ref={featuresRef} className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
