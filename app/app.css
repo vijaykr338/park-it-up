@@ -66,7 +66,7 @@ body, .min-h-screen, .bg-white, .bg-white\/90, .bg-gray-50 {
 }
 
 .hero-gradient {
-  background: linear-gradient(135deg, var(--blue-light) 0%, var(--blue-light) 100%);
+  background: linear-gradient(135deg, var(--blue-light) 0%, var(--white) 50%, var(--blue-light) 100%);
 }
 
 .stats-section {
