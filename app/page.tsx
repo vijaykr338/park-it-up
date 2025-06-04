@@ -105,27 +105,27 @@ export default function ParkItUpLanding() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#181c23]">
       {/* Nav bar */}
-      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-blue-100">
+      <nav className="fixed top-0 w-full bg-[#232834] backdrop-blur-md z-50 border-b border-blue-900">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold text-blue-600">PARK it up</div>
+            <div className="text-2xl font-bold text-blue-400">PARK it up</div>
 
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <a href="#how-it-works" className="text-gray-400 hover:text-blue-400 transition-colors">
                 How it works
               </a>
-              <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <a href="#features" className="text-gray-400 hover:text-blue-400 transition-colors">
                 Features
               </a>
-              <a href="#about" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <a href="#about" className="text-gray-400 hover:text-blue-400 transition-colors">
                 About Us
               </a>
-              <a href="#contact" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <a href="#contact" className="text-gray-400 hover:text-blue-400 transition-colors">
                 Contact
               </a>
-              <a href="#blog" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <a href="#blog" className="text-gray-400 hover:text-blue-400 transition-colors">
                 Blog
               </a>
             </div>
@@ -142,42 +142,42 @@ export default function ParkItUpLanding() {
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="hero-content">
-              <Badge className="mb-6 bg-yellow-100 text-yellow-800 border-yellow-200">
+              <Badge className="mb-6 bg-[#232834] text-yellow-400 border-yellow-900">
                 #1 best parking app 2024 🏆
               </Badge>
 
-              <h1 ref={mainTextRef} className="text-5xl lg:text-7xl font-bold text-gray-800 mb-6 leading-tight wipe-up">
+              <h1 ref={mainTextRef} className="text-5xl lg:text-7xl font-bold text-gray-100 mb-6 leading-tight wipe-up">
                 THE SOLUTION TO YOUR PARKING PROBLEMS
               </h1>
 
-              <p className="text-xl text-gray-600 mb-8 max-w-lg">
+              <p className="text-xl text-gray-400 mb-8 max-w-lg">
                 The mobile parking app that is integrated with GPS that can make it easier for you to find the nearest
                 parking lot with a variety of price ranges.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <Input placeholder="Search parking areas..." className="search-input pl-12 w-full" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                  <Input placeholder="Search parking areas..." className="search-input pl-12 w-full bg-[#232834] text-gray-100 border-blue-900" />
                 </div>
                 <div className="relative flex-1">
-                  <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <Input placeholder="Nearby access location..." className="search-input pl-12 w-full" />
+                  <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                  <Input placeholder="Nearby access location..." className="search-input pl-12 w-full bg-[#232834] text-gray-100 border-blue-900" />
                 </div>
-                <Button className="cta-button px-8">Get Access</Button>
+                <Button className="cta-button px-8 bg-blue-700 text-white hover:bg-blue-800">Get Access</Button>
               </div>
 
-              <div className="flex items-center space-x-8 text-sm text-gray-600">
+              <div className="flex items-center space-x-8 text-sm text-gray-500">
                 <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-green-500" />
+                  <Shield className="w-4 h-4 text-green-400" />
                   <span>No spam email</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4 text-blue-500" />
+                  <Clock className="w-4 h-4 text-blue-400" />
                   <span>24/7 support system</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Users className="w-4 h-4 text-yellow-500" />
+                  <Users className="w-4 h-4 text-yellow-400" />
                   <span>Free trial 13 days</span>
                 </div>
               </div>
@@ -193,10 +193,10 @@ export default function ParkItUpLanding() {
                   className="w-full h-auto"
                 />
 
-                <div className="absolute top-20 right-20 pricing-badge">$2.1/h</div>
-                <div className="absolute top-40 left-16 pricing-badge">$3.2/h</div>
-                <div className="absolute bottom-32 right-32 pricing-badge">$2.0/h</div>
-                <div className="absolute bottom-20 left-20 pricing-badge">$5.0/h</div>
+                <div className="absolute top-20 right-20 pricing-badge bg-blue-900 text-white">$2.1/h</div>
+                <div className="absolute top-40 left-16 pricing-badge bg-blue-900 text-white">$3.2/h</div>
+                <div className="absolute bottom-32 right-32 pricing-badge bg-blue-900 text-white">$2.0/h</div>
+                <div className="absolute bottom-20 left-20 pricing-badge bg-blue-900 text-white">$5.0/h</div>
               </div>
             </div>
           </div>
@@ -206,26 +206,26 @@ export default function ParkItUpLanding() {
       <section ref={statsRef} className="stats-section py-16">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 items-center">
-            <div className="text-white">
+            <div className="text-gray-100">
               <h2 className="text-2xl font-bold mb-4">
                 There are systems that offer nearby listings and competitive prices
               </h2>
             </div>
 
             <div className="stat-item text-center">
-              <div className="text-6xl font-bold text-blue-300 mb-2">99%</div>
+              <div className="text-6xl font-bold text-blue-200 mb-2">99%</div>
               <p className="text-blue-100">Accurate data based on our system</p>
             </div>
 
             <div className="stat-item text-center">
-              <div className="text-6xl font-bold text-blue-300 mb-2">570k+</div>
+              <div className="text-6xl font-bold text-blue-200 mb-2">570k+</div>
               <p className="text-blue-100">Users who are actively using the application</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section ref={featuresRef} className="py-20 bg-gray-50">
+      <section ref={featuresRef} className="py-20 bg-[#232834]">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -239,60 +239,60 @@ export default function ParkItUpLanding() {
             </div>
 
             <div>
-              <Badge className="mb-6 bg-blue-100 text-blue-800">Our best features for you 💎</Badge>
+              <Badge className="mb-6 bg-blue-900 text-blue-200">Our best features for you 💎</Badge>
 
-              <h2 className="text-4xl font-bold text-gray-800 mb-6">THE SOLUTION TO YOUR PARKING PROBLEMS</h2>
+              <h2 className="text-4xl font-bold text-gray-100 mb-6">THE SOLUTION TO YOUR PARKING PROBLEMS</h2>
 
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-lg text-gray-400 mb-8">
                 We are aware that many people have difficulty finding a parking space. We made a feature that can
                 certainly solve your parking problems so far
               </p>
 
               <div className="grid gap-6">
-                <Card className="feature-card p-6">
+                <Card className="feature-card p-6 bg-[#232834] border-blue-900">
                   <CardContent className="p-0">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Car className="w-6 h-6 text-blue-600" />
+                      <div className="w-12 h-12 bg-blue-900 rounded-lg flex items-center justify-center">
+                        <Car className="w-6 h-6 text-blue-400" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold mb-2">Well organized information</h3>
-                        <p className="text-gray-600">Clear and structured parking data for easy decision making</p>
+                        <h3 className="text-xl font-semibold mb-2 text-gray-100">Well organized information</h3>
+                        <p className="text-gray-400">Clear and structured parking data for easy decision making</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="feature-card p-6">
+                <Card className="feature-card p-6 bg-[#232834] border-blue-900">
                   <CardContent className="p-0">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                        <MapPin className="w-6 h-6 text-yellow-600" />
+                      <div className="w-12 h-12 bg-yellow-900 rounded-lg flex items-center justify-center">
+                        <MapPin className="w-6 h-6 text-yellow-400" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold mb-2">Google maps integration</h3>
-                        <p className="text-gray-600">Seamless navigation with real-time location tracking</p>
+                        <h3 className="text-xl font-semibold mb-2 text-gray-100">Google maps integration</h3>
+                        <p className="text-gray-400">Seamless navigation with real-time location tracking</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="feature-card p-6">
+                <Card className="feature-card p-6 bg-[#232834] border-blue-900">
                   <CardContent className="p-0">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Shield className="w-6 h-6 text-green-600" />
+                      <div className="w-12 h-12 bg-green-900 rounded-lg flex items-center justify-center">
+                        <Shield className="w-6 h-6 text-green-400" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold mb-2">Integrate with car sensor</h3>
-                        <p className="text-gray-600">Smart connectivity with your vehicle for automated parking</p>
+                        <h3 className="text-xl font-semibold mb-2 text-gray-100">Integrate with car sensor</h3>
+                        <p className="text-gray-400">Smart connectivity with your vehicle for automated parking</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              <Button className="mt-8 bg-gray-800 text-white hover:bg-gray-700 px-8 py-3 rounded-full">
+              <Button className="mt-8 bg-blue-900 text-white hover:bg-blue-800 px-8 py-3 rounded-full">
                 Learn More
               </Button>
             </div>
@@ -301,24 +301,24 @@ export default function ParkItUpLanding() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-[#181c23] text-gray-400 py-12 border-t border-blue-900">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-400 mb-4">PARK it up</div>
-            <p className="text-gray-400 mb-8">Making parking simple and accessible for everyone</p>
+            <p className="text-gray-500 mb-8">Making parking simple and accessible for everyone</p>
             <div className="flex justify-center space-x-6">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-500 hover:text-white transition-colors">
                 Privacy Policy
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-500 hover:text-white transition-colors">
                 Terms of Service
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="#" className="text-gray-500 hover:text-white transition-colors">
                 Contact
               </a>
             </div>
-            <div className="mt-8 pt-8 border-t border-gray-800">
-              <p className="text-gray-500">© 2024 PARK it up. All rights reserved.</p>
+            <div className="mt-8 pt-8 border-t border-blue-900">
+              <p className="text-gray-600">© 2024 PARK it up. All rights reserved.</p>
             </div>
           </div>
         </div>
