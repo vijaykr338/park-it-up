@@ -9,7 +9,11 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Search, MapPin, Car, Shield, Clock, Users } from "lucide-react"
+// import { Linkedin, Instagram, Facebook, Mail } from "lucide-react"
+import { FaLinkedin, FaInstagram, FaFacebook, FaEnvelope, FaFacebookF, FaRegEnvelopeOpen, FaGooglePlay } from "react-icons/fa"
+
 import "./app.css"
+import { FaEnvelopeCircleCheck, FaEnvelopeOpen, FaLinkedinIn, FaRegEnvelope } from "react-icons/fa6"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -210,6 +214,13 @@ export default function ParkItUpLanding() {
               <h2 className="text-2xl font-bold mb-4">
                 There are systems that offer nearby listings and competitive prices
               </h2>
+              <p className="mb-2">Curious about new developments and updates?<br />Follow our social media</p>
+              <div className="flex space-x-4">
+                <a href="https://linkedin.com" className="text-gray-400 hover:text-white"><FaLinkedin className="w-6 h-6" /></a>
+                <a href="https://instagram.com" className="text-gray-400 hover:text-white"><FaInstagram className="w-6 h-6" /></a>
+                <a href="https://facebook.com" className="text-gray-400 hover:text-white"><FaFacebook className="w-6 h-6" /></a>
+                <a href="mailto:email@example.com" className="text-gray-400 hover:text-white"><FaEnvelope className="w-6 h-6" /></a>
+              </div>
             </div>
 
             <div className="stat-item text-center">
@@ -302,24 +313,51 @@ export default function ParkItUpLanding() {
 
       {/* Footer */}
       <footer className="bg-[#181c23] text-gray-400 py-12 border-t border-blue-900">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-400 mb-4">PARK it up</div>
-            <p className="text-gray-500 mb-8">Making parking simple and accessible for everyone</p>
-            <div className="flex justify-center space-x-6">
-              <a href="#" className="text-gray-500 hover:text-white transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-gray-500 hover:text-white transition-colors">
-                Terms of Service
-              </a>
-              <a href="#" className="text-gray-500 hover:text-white transition-colors">
-                Contact
-              </a>
+        <div className="container mx-auto px-2">
+          <div className="grid md:grid-cols-4 gap-6 text-sm align-center">
+            <div>
+              <h3 className="text-shadow-white font-bold text-lg mb-4">PARK It Up</h3>
+              <p className="mb-2">Curious about new developments and updates?<br />Follow our social media</p>
+              <div className="flex space-x-4 mt-4">
+                <a href="https://www.linkedin.com/company/park-it-up/?originalSubdomain=in" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                  <FaLinkedinIn className="w-6 h-6" />
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                  <FaInstagram className="w-6 h-6" />
+                </a>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                  <FaFacebookF className="w-6 h-6" />
+                </a>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                  <FaGooglePlay className="w-6 h-6" />
+                </a>
+              </div>
             </div>
-            <div className="mt-8 pt-8 border-t border-blue-900">
-              <p className="text-gray-600">© 2024 PARK it up. All rights reserved.</p>
+            <div>
+              <h3 className="text-shadow-white font-bold text-lg mb-4">ADDRESS</h3>
+              <p className="mb-2">Delhi Technological University,<br />Delhi, India -110042</p>
             </div>
+            <div>
+              <h3 className="text-shadow-white font-bold text-lg mb-4">CONTACT US</h3>
+              <p className="mb-2">
+                <a href="tel:+919757050071" className="hover:text-white">+91 9757050071</a>
+              </p>
+              <p className="mb-2">
+                <a href="tel:+917977246237" className="hover:text-white">+91 7977246237</a>
+              </p>
+              <p className="mb-2">
+                <a href="mailto:pranjalchaurasia_23se113@dtu.ac.in" className="hover:text-white">pranjalchaurasia_23se113@dtu.ac.in</a>
+              </p>
+            </div>
+            <div>
+              <h3 className="text-shadow-white font-bold text-lg mb-4">OUR POLICIES</h3>
+              <p className="mb-2"><a href="#" className="hover:text-white transition-colors mb-2">Privacy Policy</a></p>
+              <p className="mb-2"><a href="#" className="hover:text-white transition-colors mb-2">Term of Use</a></p>
+              <p className="mb-2"><a href="#" className="hover:text-white transition-colors mb-2">Term of Order</a></p>
+            </div>
+          </div>
+          <div className="text-center mt-10 pt-4 border-t border-blue-900">
+            <p className="text-gray-600 text-sm pt-2">© 2025 PARK It Up. All rights reserved.</p>
           </div>
         </div>
       </footer>
