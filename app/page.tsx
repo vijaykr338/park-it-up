@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef,useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Image from "next/image"
@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge"
 import { Search, MapPin, Car, Shield, Clock, Users } from "lucide-react"
 // import { Linkedin, Instagram, Facebook, Mail } from "lucide-react"
 import { FaLinkedin, FaInstagram, FaFacebook, FaEnvelope, FaFacebookF, FaRegEnvelopeOpen, FaGooglePlay } from "react-icons/fa"
-
 import "./app.css"
 import { FaEnvelopeCircleCheck, FaEnvelopeOpen, FaLinkedinIn, FaRegEnvelope } from "react-icons/fa6"
 
@@ -22,6 +21,47 @@ export default function ParkItUpLanding() {
   const statsRef = useRef<HTMLDivElement>(null)
   const featuresRef = useRef<HTMLDivElement>(null)
   const mainTextRef = useRef<HTMLHeadingElement>(null)
+  const [currentTestimonial, setCurrentTestimonial] = useState(0)
+  const [isHovered, setIsHovered] = useState(false)
+  const testimonialRef = useRef<HTMLDivElement>(null)
+
+  const testimonials = [
+    {
+      name: "Virat Kohli",  
+      image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRqm3FRuMyJxozqZ5FpeE5EbgmAkRkX3LCc_AeaQp2jMMESpK8zI5fyh_RXhoTe2JI9XBd4_PKbsFDUlRc_YNWwdkblg6i6xHR07dTCyu8e1Q",
+      text: "This app has completely transformed how I find parking in the city. No more driving around for 20 minutes looking for a spot!",
+      rating: 4.8,
+      source: "Play store",
+    },
+    {
+      name: "Rohit Sharma",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5MVt2B5udFNhfw8ZeC_cJiOwAPdO7fCZlZA&s",
+      text: "The GPS integration is incredible. It shows me exactly where available spots are and even tells me the pricing upfront.",
+      rating: 4.8,
+      source: "App store",
+    },
+    {
+      name: "Sachin Tendulkar",
+      image: "https://i0.wp.com/sportsistan.com/wp-content/uploads/2024/07/Sachin-Tendulkar-Stats-Records-and-Awards.webp",
+      text: "I love the real-time updates and the ability to reserve spots ahead of time. Makes my daily commute so much easier!",
+      rating: 4.9,
+      source: "Play store",
+    },
+    {
+      name: "Jasprit Bumrah",
+      image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRRfLilfD7Se3ixE4hFZSgY1cwqewl0_msa6LDSzJIVrRCsuYg2ABHT1Wa-6elodxeYxXtd7DyZEqMCyyZBh0MluuhPJkvOOZXZ4k4xyjGb4Q",
+      text: "The user interface is so clean and intuitive. Even my parents can use it without any problems. Highly recommended!",
+      rating: 4.7,
+      source: "App store",
+    },
+  ]
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
+  }
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -76,7 +116,6 @@ export default function ParkItUpLanding() {
         },
       })
 
-      // Features section scroll animation
       ScrollTrigger.create({
         trigger: featuresRef.current,
         start: "top 70%",
@@ -108,10 +147,30 @@ export default function ParkItUpLanding() {
     return () => ctx.revert()
   }, [])
 
+  useEffect(() => {
+    if (!isHovered) {
+      const interval = setInterval(() => {
+        nextTestimonial()
+      }, 9000) //time
+
+      return () => clearInterval(interval)
+    }
+  }, [isHovered, currentTestimonial])
+
+  useEffect(() => {
+    if (testimonialRef.current) {
+      gsap.fromTo(
+        testimonialRef.current,
+        { opacity: 0, x: 40 },
+        { opacity: 1, x: 0, duration: 1.5, ease: "power2.out" },
+      )
+    }
+  }, [currentTestimonial])
+
   return (
-    <div className="min-h-screen bg-[#181c23]">
+    <div className="min-h-screen ">
       {/* Nav bar */}
-      <nav className="fixed top-0 w-full bg-[#232834] backdrop-blur-md z-50 border-b border-blue-900">
+      <nav className="fixed top-0 w-full backdrop-blur-md z-50 border-b border-blue-900">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="text-2xl font-bold text-blue-400">PARK it up</div>
@@ -141,9 +200,8 @@ export default function ParkItUpLanding() {
           </div>
         </div>
       </nav>
-
-      <section ref={heroRef} className="hero-gradient pt-24 pb-16 min-h-screen flex items-center">
-        <div className="container mx-auto px-4">
+      <section ref={heroRef} className=" pt-24 pb-16 min-h-screen flex items-center">
+        <div className="container mx-auto px-4 ">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="hero-content">
               <Badge className="mb-6 bg-[#232834] text-yellow-400 border-yellow-900">
@@ -205,7 +263,7 @@ export default function ParkItUpLanding() {
             </div>
           </div>
         </div>
-      </section>
+      </section> 
 
       <section ref={statsRef} className="stats-section py-16">
         <div className="container mx-auto px-4">
@@ -236,7 +294,7 @@ export default function ParkItUpLanding() {
         </div>
       </section>
 
-      <section ref={featuresRef} className="py-20 bg-[#232834]">
+      <section ref={featuresRef} className="py-20 ">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -306,6 +364,118 @@ export default function ParkItUpLanding() {
               <Button className="mt-8 bg-blue-900 text-white hover:bg-blue-800 px-8 py-3 rounded-full">
                 Learn More
               </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-gray-800 py-20 mx-10 mb-10 rounded-4xl">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="relative" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+              <div className="overflow-hidden">
+                <div ref={testimonialRef} className="bg-gray-700 rounded-2xl p-8 min-h-[300px]">
+                  <div className="flex items-center mb-6">
+                    <div className="w-16 h-16 rounded-full overflow-hidden mr-4 bg-gray-600">
+                      <Image
+                        src={testimonials[currentTestimonial].image || "/placeholder.svg"}
+                        alt={testimonials[currentTestimonial].name}
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold text-lg">{testimonials[currentTestimonial].name}</h4>
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <svg className="w-8 h-8 text-gray-500 mb-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z" />
+                    </svg>
+                    <p className="text-gray-300 leading-relaxed text-lg">{testimonials[currentTestimonial].text}</p>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="flex items-center mr-3">
+                        <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <span className="text-white font-semibold ml-1">{testimonials[currentTestimonial].rating}</span>
+                      </div>
+                      <span className="text-gray-400 text-sm">from {testimonials[currentTestimonial].source}</span>
+                    </div>
+
+                    <div className="flex space-x-2">
+                      {testimonials.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentTestimonial(index)}
+                          className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                            index === currentTestimonial ? "bg-blue-400 w-6" : "bg-gray-500 hover:bg-gray-400"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={prevTestimonial}
+                className="absolute left-0 top-1/2  transform -translate-y-1/2 rounded-full p-1 transition-all duration-300 hover:scale-110"
+              >
+                <svg className="w-6 h-6 text-white hover:text-4xl opacity-60 hover:opacity-100 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={nextTestimonial}
+                className="absolute right-0 top-1/2  transform -translate-y-1/2  rounded-full p-1 transition-all duration-300 hover:scale-110"
+              >
+                <svg className="w-6 h-6 text-white hover:text-4xl opacity-60 hover:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              <div className="mt-6 w-full bg-gray-600 rounded-full h-1">
+                <div
+                  className="bg-blue-400 h-1 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${((currentTestimonial + 1) / testimonials.length) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+            <div className="text-center lg:text-left">
+              <Badge className="mb-6 bg-gray-600 text-white border-gray-500">Testimonials from user </Badge>
+
+              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+                WHAT OUR USER SAY ABOUT US
+              </h2>
+
+              <p className="text-xl text-gray-300 mb-8 max-w-lg">
+                You will get many benefits from our features. Finding a parking space becomes easier
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 items-center lg:items-start">
+                <Button className="bg-gray-600 hover:bg-gray-500 text-white px-8 py-3 rounded-full border-2 border-gray-500 hover:border-gray-400 transition-all">
+                  Learn More
+                </Button>
+
+                <div className="flex items-center space-x-4 text-gray-300">
+                  <div className="flex items-center space-x-1">
+                    <span className="text-2xl font-bold text-blue-400">{testimonials.length}</span>
+                    <span className="text-sm">Happy Users</span>
+                  </div>
+                  <div className="w-px h-6 bg-gray-600"></div>
+                  <div className="flex items-center space-x-1">
+                    <span className="text-2xl font-bold text-yellow-400">4.8</span>
+                    <span className="text-sm">Avg Rating</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
