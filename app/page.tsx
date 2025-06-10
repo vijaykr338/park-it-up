@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef,useState } from "react"
+import { useEffect, useRef,useState, useCallback } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Image from "next/image"
@@ -24,6 +24,7 @@ export default function ParkItUpLanding() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const testimonialRef = useRef<HTMLDivElement>(null)
+  const ctaRef = useRef<HTMLDivElement>(null)
 
   const testimonials = [
     {
@@ -56,9 +57,9 @@ export default function ParkItUpLanding() {
     },
   ]
 
-  const nextTestimonial = () => {
+  const nextTestimonial = useCallback(() => {
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
-  }
+  }, [testimonials.length])
   const prevTestimonial = () => {
     setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)
   }
@@ -133,6 +134,36 @@ export default function ParkItUpLanding() {
           )
         },
       })
+            ScrollTrigger.create({
+        trigger: ctaRef.current,
+        start: "top 80%",
+        onEnter: () => {
+          gsap.fromTo(
+            ".cta-content > *",
+            { y: 40, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              stagger: 0.15,
+              ease: "power2.out",
+            },
+          )
+
+          gsap.fromTo(
+            ".phone-mockup",
+            { y: 60, opacity: 0, rotation: -5 },
+            {
+              y: 0,
+              opacity: 1,
+              rotation: 0,
+              duration: 1,
+              stagger: 0.2,
+              ease: "back.out(1.2)",
+            },
+          )
+        },
+      })
 
       gsap.to(".pricing-badge", {
         y: -10,
@@ -142,7 +173,17 @@ export default function ParkItUpLanding() {
         repeat: -1,
         stagger: 0.3,
       })
-    }, [heroRef, statsRef, featuresRef])
+      gsap.to(".phone-mockup", {
+        y: -15,
+        duration: 3,
+        ease: "power2.inOut",
+        yoyo: true,
+        repeat: -1,
+        stagger: 0.5
+      })
+
+    }, [heroRef, statsRef, featuresRef, ctaRef])
+
 
     return () => ctx.revert()
   }, [])
@@ -155,7 +196,7 @@ export default function ParkItUpLanding() {
 
       return () => clearInterval(interval)
     }
-  }, [isHovered, currentTestimonial])
+  }, [isHovered, currentTestimonial, nextTestimonial])
 
   useEffect(() => {
     if (testimonialRef.current) {
@@ -481,6 +522,223 @@ export default function ParkItUpLanding() {
         </div>
       </section>
 
+      <section ref={ctaRef} className="cta-gradient py-20 overflow-hidden">
+        <div className="container mx-auto px-4 mb-10 ml-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Content */}
+            <div className="cta-content text-center lg:text-left">
+              <Badge className="mb-6 bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                Free trial download now 🎉
+              </Badge>
+
+              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+                BE PART OF THE FUTURE PARKING ERA NOW
+              </h2>
+
+              <p className="text-xl text-white/80 mb-8 max-w-lg">
+                You can try this application for 13 days and please feel the convenience of the future.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 max-w-lg">
+                <Input
+                  placeholder="Enter your email address"
+                  className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/20 focus:border-white/40"
+                />
+                <Button className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105">
+                  Get Access
+                </Button>
+              </div>
+            </div>
+
+            {/* Right Content - Phone Mockups */}
+            <div className="relative flex justify-center lg:justify-end">
+              <div className="relative">
+                {/* Phone 1 */}
+                <div className="phone-mockup relative z-10 mx-65 ">
+                  <div className="w-72 h-[580px] bg-gray-900 rounded-[3rem]  p-3 shadow-2xl">
+                    <div className="w-full h-full bg-gray-800 rounded-[2.5rem] overflow-hidden relative">
+                      {/* Status Bar */}
+                      <div className="flex justify-between items-center px-6 py-3 text-white text-sm">
+                        <span>9:41</span>
+                        <div className="flex items-center space-x-1">
+                          <div className="flex space-x-1">
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white/50 rounded-full"></div>
+                          </div>
+                          <div className="w-6 h-3 border border-white rounded-sm">
+                            <div className="w-4 h-2 bg-white rounded-sm m-0.5"></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* App Content */}
+                      <div className="px-4 space-y-4 ">
+                        {/* User Profile */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-blue-500 rounded-full"></div>
+                            <div>
+                              <p className="text-white text-sm">Welcome back</p>
+                              <p className="text-white font-semibold">Ali Husni !</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2 text-white text-sm">
+                            <MapPin className="w-4 h-4" />
+                            <span>Pati, IDN</span>
+                          </div>
+                        </div>
+
+                        {/* Search Bar */}
+                        <div className="bg-gray-700 rounded-xl p-3 flex items-center space-x-3">
+                          <Search className="w-5 h-5 text-gray-400" />
+                          <span className="text-gray-400">Search a parking area</span>
+                        </div>
+
+                        {/* Vehicle Section */}
+                        <div className="bg-gray-700 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-gray-400 text-sm">My Vehicle</span>
+                            <Car className="w-4 h-4 text-gray-400" />
+                          </div>
+                          <h3 className="text-white font-bold text-lg mb-3">Porsche 817T</h3>
+                          <div className="bg-gray-600 rounded-lg p-3 flex items-center justify-between">
+                            <div className="w-16 h-10 bg-gray-500 rounded flex items-center justify-center">
+                              <Car className="w-8 h-8 text-white" />
+                            </div>
+                            <span className="text-white text-sm">Explore</span>
+                          </div>
+                        </div>
+
+                        {/* Last Parking */}
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-white font-semibold">Last Parking space</span>
+                            <span className="text-gray-400 text-sm">See more</span>
+                          </div>
+                          <div className="bg-gray-700 rounded-xl p-4">
+                            <div className="flex items-center space-x-3 mb-3">
+                              <div className="w-10 h-10 bg-yellow-500 rounded-full"></div>
+                              <div>
+                                <p className="text-white font-semibold">Pati Mall Parking</p>
+                                <p className="text-gray-400 text-sm">st Pati wallabe no 04, Pati City</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex space-x-4 text-sm">
+                                <div>
+                                  <p className="text-gray-400">Distance</p>
+                                  <p className="text-white">1.5 km</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-400">Pricing</p>
+                                  <p className="text-white">$ 21 / h</p>
+                                </div>
+                              </div>
+                              <Button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+                                Book Now
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phone 2 */}
+                <div className="phone-mockup absolute right-30 top-20 z-0">
+                  <div className="w-72 h-[580px] bg-gray-900 rounded-[3rem] p-3 shadow-2xl">
+                    <div className="w-full h-full bg-gray-800 rounded-[2.5rem] overflow-hidden relative">
+                      {/* Status Bar */}
+                      <div className="flex justify-between items-center px-6 py-3 text-white text-sm">
+                        <span>9:41</span>
+                        <div className="flex items-center space-x-1">
+                          <div className="flex space-x-1">
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white/50 rounded-full"></div>
+                          </div>
+                          <div className="w-6 h-3 border border-white rounded-sm">
+                            <div className="w-4 h-2 bg-white rounded-sm m-0.5"></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Map View */}
+                      <div className="px-4 space-y-4">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <button className="p-2 bg-gray-700 rounded-full">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          <span className="text-white font-semibold">Pati City, IDN</span>
+                          <Search className="w-5 h-5 text-gray-400 ml-auto" />
+                        </div>
+
+                        {/* Map Area */}
+                        <div className="bg-blue-900 rounded-xl h-80 relative overflow-hidden">
+                          {/* Simulated map with parking spots */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-800 to-blue-900">
+                            {/* Parking spot indicators */}
+                            <div className="absolute top-16 left-8 w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                              $2.1/h
+                            </div>
+                            <div className="absolute top-32 right-12 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                              $3.2/h
+                            </div>
+                            <div className="absolute bottom-24 left-16 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                              $5.0/h
+                            </div>
+
+                            {/* Car icon */}
+                            <div className="absolute bottom-32 right-20 w-8 h-6 bg-white rounded transform rotate-45"></div>
+                          </div>
+                        </div>
+
+                        {/* Spots near you */}
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-white font-semibold">Spots near you</span>
+                            <span className="text-gray-400 text-sm">See more</span>
+                          </div>
+                          <div className="bg-gray-700 rounded-xl p-4">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-10 h-10 bg-blue-500 rounded-full"></div>
+                              <div className="flex-1">
+                                <p className="text-white font-semibold">Disneyland Pati</p>
+                                <p className="text-gray-400 text-sm">Jati Disneyland no 04, Pati City</p>
+                                <div className="flex items-center justify-between mt-2">
+                                  <div className="flex space-x-4 text-sm">
+                                    <div>
+                                      <span className="text-gray-400">Distance</span>
+                                      <span className="text-white ml-2">102 m</span>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-400">Pricing</span>
+                                      <span className="text-white ml-2">$ 5.0 / h</span>
+                                    </div>
+                                  </div>
+                                  <Button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded-lg text-sm">
+                                    Book Now
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Footer */}
       <footer className="bg-[#181c23] text-gray-400 py-12 border-t border-blue-900">
         <div className="container mx-auto px-2">

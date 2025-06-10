@@ -27,6 +27,7 @@
 body {
   background: linear-gradient(
     100deg,
+    /* 90deg */
     rgb(2, 15, 34) 45%,
     rgb(2, 21, 47) 70%,
     rgb(3, 2, 67) 100%
@@ -175,4 +176,14 @@ body {
 .testimonial-navigation:hover {
   background: rgba(75, 85, 99, 0.9);
   transform: scale(1.1);
+}
+
+.phone-mockup {
+  transition: all 0.5s ease-in-out;
+}
+
+.phone-frame {
+  max-width: 100%;
+  border: 4px solid #1f1f1f;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
