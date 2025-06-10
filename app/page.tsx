@@ -10,9 +10,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Search, MapPin, Car, Shield, Clock, Users } from "lucide-react"
 // import { Linkedin, Instagram, Facebook, Mail } from "lucide-react"
-import { FaLinkedin, FaInstagram, FaFacebook, FaEnvelope, FaFacebookF, FaRegEnvelopeOpen, FaGooglePlay } from "react-icons/fa"
+import { FaLinkedin, FaInstagram, FaFacebook, FaEnvelope, FaFacebookF, FaGooglePlay } from "react-icons/fa"
 import "./app.css"
-import { FaEnvelopeCircleCheck, FaEnvelopeOpen, FaLinkedinIn, FaRegEnvelope } from "react-icons/fa6"
+import {FaLinkedinIn} from "react-icons/fa6"
 
 gsap.registerPlugin(ScrollTrigger)
 
