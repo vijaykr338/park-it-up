@@ -13,7 +13,7 @@ import { Search, MapPin, Car, Shield, Clock, Users } from "lucide-react"
 import { FaLinkedin, FaInstagram, FaFacebook, FaEnvelope, FaFacebookF, FaGooglePlay } from "react-icons/fa"
 import "./app.css"
 import {FaLinkedinIn} from "react-icons/fa6"
-
+import ThemeSwitch from "@/components/ThemeSwitch"
 gsap.registerPlugin(ScrollTrigger)
 
 export default function ParkItUpLanding() {
@@ -217,7 +217,7 @@ export default function ParkItUpLanding() {
             <div className="text-2xl font-bold text-blue-400">PARK it up</div>
 
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#how-it-works" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href="#how-it-works" className="text-gray-400 hover:text-blue-400 transition-colors ">
                 How it works
               </a>
               <a href="#features" className="text-gray-400 hover:text-blue-400 transition-colors">
@@ -235,6 +235,7 @@ export default function ParkItUpLanding() {
             </div>
 
             <div className="flex items-center space-x-3">
+              <ThemeSwitch/>
               <Button className="nav-button secondary">Sign In</Button>
               <Button className="nav-button">Sign Up</Button>
             </div>
@@ -249,11 +250,11 @@ export default function ParkItUpLanding() {
                 #1 best parking app 2024 🏆
               </Badge>
 
-              <h1 ref={mainTextRef} className="text-5xl lg:text-7xl font-bold text-gray-100 mb-6 leading-tight wipe-up">
+              <h1 ref={mainTextRef} className="main-h1 text-5xl lg:text-7xl font-bold    mb-6 leading-tight wipe-up">
                 THE SOLUTION TO YOUR PARKING PROBLEMS
               </h1>
 
-              <p className="text-xl text-gray-400 mb-8 max-w-lg">
+              <p className="text-xl  text-black dark:text-gray-400 mb-8 max-w-lg">
                 The mobile parking app that is integrated with GPS that can make it easier for you to find the nearest
                 parking lot with a variety of price ranges.
               </p>
@@ -267,12 +268,12 @@ export default function ParkItUpLanding() {
                   <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                   <Input placeholder="Nearby access location..." className="search-input pl-12 w-full bg-[#232834] text-gray-100 border-blue-900" />
                 </div>
-                <Button className="cta-button px-8 bg-blue-700 text-white hover:bg-blue-800">Get Access</Button>
+                <Button className="cta-button px-8 bg-blue-700  text-black hover:bg-blue-800 dark:text-white ">Get Access</Button>
               </div>
 
-              <div className="flex items-center space-x-8 text-sm text-gray-500">
+              <div className="flex items-center space-x-8 text-sm text-black dark:text-gray-500">
                 <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-green-400" />
+                  <Shield className="w-4 h-4  text-green-400" />
                   <span>No spam email</span>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -309,27 +310,27 @@ export default function ParkItUpLanding() {
       <section ref={statsRef} className="stats-section py-16">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 items-center">
-            <div className="text-gray-100">
+            <div className="text-gray-500  dark:text-gray-100">
               <h2 className="text-2xl font-bold mb-4">
                 There are systems that offer nearby listings and competitive prices
               </h2>
               <p className="mb-2">Curious about new developments and updates?<br />Follow our social media</p>
               <div className="flex space-x-4">
-                <a href="https://linkedin.com" className="text-gray-400 hover:text-white"><FaLinkedin className="w-6 h-6" /></a>
-                <a href="https://instagram.com" className="text-gray-400 hover:text-white"><FaInstagram className="w-6 h-6" /></a>
-                <a href="https://facebook.com" className="text-gray-400 hover:text-white"><FaFacebook className="w-6 h-6" /></a>
-                <a href="mailto:email@example.com" className="text-gray-400 hover:text-white"><FaEnvelope className="w-6 h-6" /></a>
+                <a href="https://linkedin.com" className="text-black  hover:text-white dark:text-gray-400 dark:hover:text-white"><FaLinkedin className="w-6 h-6" /></a>
+                <a href="https://instagram.com" className="text-black  hover:text-white dark:text-gray-400 dark:hover:text-white"><FaInstagram className="w-6 h-6" /></a>
+                <a href="https://facebook.com" className="text-black  hover:text-white dark:text-gray-400 dark:hover:text-white"><FaFacebook className="w-6 h-6" /></a>
+                <a href="mailto:email@example.com" className="text-black  hover:text-white dark:text-gray-400 dark:hover:text-white"><FaEnvelope className="w-6 h-6" /></a>
               </div>
             </div>
 
             <div className="stat-item text-center">
-              <div className="text-6xl font-bold text-blue-200 mb-2">99%</div>
-              <p className="text-blue-100">Accurate data based on our system</p>
+              <div className="text-6xl font-bold text-blue-700 dark:text-blue-200 mb-2">99%</div>
+              <p className="text-blue-600 dark:text-blue-100">Accurate data based on our system</p>
             </div>
 
             <div className="stat-item text-center">
-              <div className="text-6xl font-bold text-blue-200 mb-2">570k+</div>
-              <p className="text-blue-100">Users who are actively using the application</p>
+              <div className="text-6xl font-bold text-blue-700 dark:text-blue-200 mb-2">570k+</div>
+              <p className="text-blue-600 dark:text-blue-100">Users who are actively using the application</p>
             </div>
           </div>
         </div>
@@ -351,9 +352,9 @@ export default function ParkItUpLanding() {
             <div>
               <Badge className="mb-6 bg-blue-900 text-blue-200">Our best features for you 💎</Badge>
 
-              <h2 className="text-4xl font-bold text-gray-100 mb-6">THE SOLUTION TO YOUR PARKING PROBLEMS</h2>
+              <h2 className=" main-h2 text-4xl font-bold  mb-6">THE SOLUTION TO YOUR PARKING PROBLEMS</h2>
 
-              <p className="text-lg text-gray-400 mb-8">
+              <p className="text-lg text-black dark:text-gray-400 mb-8">
                 We are aware that many people have difficulty finding a parking space. We made a feature that can
                 certainly solve your parking problems so far
               </p>
@@ -362,12 +363,12 @@ export default function ParkItUpLanding() {
                 <Card className="feature-card p-6 bg-[#232834] border-blue-900">
                   <CardContent className="p-0">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-blue-900 rounded-lg flex items-center justify-center">
+                      <div className="w-12 h-12 bg-blue-800 rounded-lg flex items-center justify-center">
                         <Car className="w-6 h-6 text-blue-400" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold mb-2 text-gray-100">Well organized information</h3>
-                        <p className="text-gray-400">Clear and structured parking data for easy decision making</p>
+                        <h3 className="text-xl font-semibold mb-2  text-gray-700 dark:text-gray-100">Well organized information</h3>
+                        <p className=" text-gray-700 dark:text-gray-400">Clear and structured parking data for easy decision making</p>
                       </div>
                     </div>
                   </CardContent>
@@ -380,8 +381,8 @@ export default function ParkItUpLanding() {
                         <MapPin className="w-6 h-6 text-yellow-400" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold mb-2 text-gray-100">Google maps integration</h3>
-                        <p className="text-gray-400">Seamless navigation with real-time location tracking</p>
+                        <h3 className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-100">Google maps integration</h3>
+                        <p className="text-gray-700 dark:text-gray-400">Seamless navigation with real-time location tracking</p>
                       </div>
                     </div>
                   </CardContent>
@@ -394,8 +395,8 @@ export default function ParkItUpLanding() {
                         <Shield className="w-6 h-6 text-green-400" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold mb-2 text-gray-100">Integrate with car sensor</h3>
-                        <p className="text-gray-400">Smart connectivity with your vehicle for automated parking</p>
+                        <h3 className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-100">Integrate with car sensor</h3>
+                        <p className="text-gray-700 dark:text-gray-400">Smart connectivity with your vehicle for automated parking</p>
                       </div>
                     </div>
                   </CardContent>
@@ -410,7 +411,7 @@ export default function ParkItUpLanding() {
         </div>
       </section>
 
-      <section className="bg-gray-800 py-20 mx-10 mb-10 rounded-4xl">
+       <section className="bg-gray-800 py-20 mx-10 mb-10 rounded-4xl">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
@@ -527,22 +528,22 @@ export default function ParkItUpLanding() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Content */}
             <div className="cta-content text-center lg:text-left">
-              <Badge className="mb-6 bg-white/20 text-white border-white/30 backdrop-blur-sm">
+              <Badge className="mb-6  bg-gray-400  text-blue dark:bg-white/20 dark:text-white  border-white/30 backdrop-blur-sm">
                 Free trial download now 🎉
               </Badge>
 
-              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+              <h2 className=" main-he text-4xl lg:text-5xl font-bold   mb-6 leading-tight">
                 BE PART OF THE FUTURE PARKING ERA NOW
               </h2>
 
-              <p className="text-xl text-white/80 mb-8 max-w-lg">
+              <p className="text-xl text-black dark:text-white/80 mb-8 max-w-lg">
                 You can try this application for 13 days and please feel the convenience of the future.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 max-w-lg">
                 <Input
                   placeholder="Enter your email address"
-                  className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-white/20 focus:border-white/40"
+                  className="flex-1  bg-gray-400  border-gray-600 dark:bg-white/10 dark:border-white/20 text-white placeholder:text-white/60 backdrop-blur-sm focus:bg-gray-500 dark:focus:border-gray-700 dark:focus:bg-white/20 dark:focus:border-white/40"
                 />
                 <Button className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105">
                   Get Access
@@ -740,23 +741,23 @@ export default function ParkItUpLanding() {
         </div>
       </section>
       {/* Footer */}
-      <footer className="bg-[#181c23] text-gray-400 py-12 border-t border-blue-900">
+      <footer className=" bg-[#007BFF] dark:bg-[#181c23] text-white dark:text-gray-400 py-12 border-t border-blue-900">
         <div className="container mx-auto px-2">
           <div className="grid md:grid-cols-4 gap-6 text-sm align-center">
             <div>
               <h3 className="text-shadow-white font-bold text-lg mb-4">PARK It Up</h3>
               <p className="mb-2">Curious about new developments and updates?<br />Follow our social media</p>
               <div className="flex space-x-4 mt-4">
-                <a href="https://www.linkedin.com/company/park-it-up/?originalSubdomain=in" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <a href="https://www.linkedin.com/company/park-it-up/?originalSubdomain=in" target="_blank" rel="noopener noreferrer" className=" text:white/20 hover:text-white/40 dark:text-gray-400 dark:hover:text-white transition-colors">
                   <FaLinkedinIn className="w-6 h-6" />
                 </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text:white/20 hover:text-white/40 dark:text-gray-400 dark:hover:text-white transition:colors">
                   <FaInstagram className="w-6 h-6" />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text:white/20 hover:text-white/40 dark:text-gray-400 dark:hover:text-white transition:colors">
                   <FaFacebookF className="w-6 h-6" />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                <a href="#" target="_blank" rel="noopener noreferrer" className="text:white/20 hover:text-white/40 dark:text-gray-400 dark:hover:text-white transition-colors">
                   <FaGooglePlay className="w-6 h-6" />
                 </a>
               </div>
@@ -779,13 +780,13 @@ export default function ParkItUpLanding() {
             </div>
             <div>
               <h3 className="text-shadow-white font-bold text-lg mb-4">OUR POLICIES</h3>
-              <p className="mb-2"><a href="#" className="hover:text-white transition-colors mb-2">Privacy Policy</a></p>
+              <p className="mb-2"><a href="#" className=" hover:text-white transition-colors mb-2">Privacy Policy</a></p>
               <p className="mb-2"><a href="#" className="hover:text-white transition-colors mb-2">Term of Use</a></p>
               <p className="mb-2"><a href="#" className="hover:text-white transition-colors mb-2">Term of Order</a></p>
             </div>
           </div>
           <div className="text-center mt-10 pt-4 border-t border-blue-900">
-            <p className="text-gray-600 text-sm pt-2">© 2025 PARK It Up. All rights reserved.</p>
+            <p className=" text:white dark:text-gray-600 text-sm pt-2">© 2025 PARK It Up. All rights reserved.</p>
           </div>
         </div>
       </footer>
