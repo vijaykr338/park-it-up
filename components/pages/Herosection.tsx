@@ -32,7 +32,7 @@ const Herosection = () => {
                             <div className="relative flex-1">
                                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                                 <Input placeholder="Search for parking..." className="search-input pl-12 w-full rounded-full h-12 bg-[#232834] text-gray-100 border-[#4d84a4]" />
-                                <Button className="cta-button absolute right-1 top-1/2 -translate-y-1/2 px-4 sm:px-8 h-10 rounded-full bg-[#4d84a4] text-white hover:bg-blue-400 cursor-pointer">Search</Button>
+                                <Button className="cta-button absolute right-1 top-1/2 -translate-y-1/2 px-4 sm:px-8 h-10 rounded-full bg-[#4d84a4] text-white hover:bg-blue-400 cursor-pointer">Nearby</Button>
                             </div>
                         </div>
 
