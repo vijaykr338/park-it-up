@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, Car } from 'lucide-react';
+// import { Search, MapPin, Car } from 'lucide-react';
 import Image from 'next/image';
 import Mock1 from '@/components/assets/phone_mockup1.png';
 import Mock2 from '@/components/assets/phone_mockup2.png';
