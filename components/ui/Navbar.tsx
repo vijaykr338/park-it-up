@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import ParkitUp from '@/components/assets/Parkitup_logo.png';
 import Link from 'next/link';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { User } from 'lucide-react';
 
 const Navbar = () => {
   return (
@@ -48,7 +50,27 @@ const Navbar = () => {
               </Link>
             </Button>
             
+       {/* Right Side - Auth/Profile */}
+        <div className="flex items-center gap-4">
+          {/* Profile Button */}
+          <Link href="/profile">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="flex items-center gap-2 text-gray-300 hover:text-white hover:bg-[#232834]"
+            >
+              <Avatar className="w-8 h-8">
+                <AvatarImage src="https://imgs.search.brave.com/6lqh3FAE6njbdfwZ_bSyVWQi24L-AncLO64V3Qw_IDw/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzEyL2Zh/LzgxLzEyZmE4MTEw/MGY1NGQ3NGMwMzI5/ZDIwNmNkMDJmMzli/LmpwZw" alt="Profile" />
+                <AvatarFallback className="bg-[#4a90a4] text-white text-sm">
+                  <User className="w-4 h-4" />
+                </AvatarFallback>
+              </Avatar>
+              <span className="hidden sm:inline">Profile</span>
+            </Button>
+          </Link>
+            
           </div>
+        </div>
         </div>
       </div>
     </nav>
