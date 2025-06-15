@@ -146,7 +146,7 @@ body {
 .nav-button.secondary {
   background: transparent;
   color: var(--blue);
-  border: 2px solid var(--blue);
+  border: 1px solid var(--blue);
 }
 
 .nav-button.secondary:hover {
