@@ -3,10 +3,10 @@ import React from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import ParkitUp from '@/components/assets/Parkitup_logo.png';
-import parkituptext from '@/components/assets/park-it-up.jpg';
+// import parkituptext from '@/components/assets/park-it-up.jpg';
 import Link from 'next/link';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { User } from 'lucide-react';
+// import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+// import { User } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {

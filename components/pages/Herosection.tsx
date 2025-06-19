@@ -4,7 +4,7 @@ import { Search, CircleCheckBig } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import ParkVisual from '@/components/assets/hero.png'
+// import ParkVisual from '@/components/assets/hero.png'
 
 const Herosection = () => {
     return (
