@@ -9,7 +9,7 @@ import ParkVisual from '@/components/assets/hero.png'
 const Herosection = () => {
     return (
         // <section ref={heroRef} className=" pt-24 pb-16 min-h-screen flex items-center">
-        <section className="w-full pb-20 bg-[#141a24]">
+        <section className="w-full py-10 bg-[#141a24]">
             <div className="max-w-7xl container mx-auto flex items-center relative px-4 py-12 lg:py-0">
                 <div className="grid lg:grid-cols-2 items-center gap-8">
                     <div className="hero-content">
@@ -55,7 +55,7 @@ const Herosection = () => {
                     <div className="hidden lg:block">
                         <div>
                             <Image
-                                src={ParkVisual}
+                                src="/car_parking.svg"
                                 alt="Parking visualization"
                                 width={600}
                                 height={400}
