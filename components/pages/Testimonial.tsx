@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button'
 import TestimonialCard from '@/components/ui/TestimonialCard'
 import Marquee from '@/components/ui/marquee';
 
-interface TestimonialType {
-    name: string;
-    image: string;
-    text: string;
-    rating: number;
-    source: string;
-}
+// interface TestimonialType {
+//     name: string;
+//     image: string;
+//     text: string;
+//     rating: number;
+//     source: string;
+// }
 
 const Testimonial = () => {
     return (

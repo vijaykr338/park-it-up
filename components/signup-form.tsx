@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Login from "@/components/assets/parkit-login.png";
-import Image from "next/image";
+// import Login from "@/components/assets/parkit-login.png";
+// import Image from "next/image";
 import Link from "next/link";
-import Signup from "@/components/assets/parkit-signup.png";
+// import Signup from "@/components/assets/parkit-signup.png";
 
 export function SignupForm({
   className,

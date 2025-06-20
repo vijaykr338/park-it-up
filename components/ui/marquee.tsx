@@ -1,8 +1,8 @@
 "use client";
 import React, { ReactNode } from "react";
 import { motion } from "framer-motion";
-import testimonials from "@/components/utils/testimonials";
-import TestimonialCard from "@/components/ui/TestimonialCard";
+// import testimonials from "@/components/utils/testimonials";
+// import TestimonialCard from "@/components/ui/TestimonialCard";
 
 interface MarqueeProps {
   children: ReactNode;
