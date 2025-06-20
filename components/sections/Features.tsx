@@ -10,7 +10,7 @@ import Image from 'next/image';
 
 const Features = () => {
     return (
-        <section className="py-20 bg-[#141a24]">
+        <section className="py-20 bg-[#0a121a]">
             <div className="container mx-auto px-4 max-w-7xl">
                 <div className="flex flex-col lg:grid lg:grid-cols-2 gap-16 items-center">
                     <div className="relative h-[400px] sm:h-[500px] md:h-[600px] flex items-center justify-center mb-10 lg:mb-0">

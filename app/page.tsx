@@ -1,5 +1,5 @@
 import React from 'react';
-import { Herosection, Statsection, Features, Testimonial, Ctasection } from '@/components/pages';
+import { Herosection, Statsection, Features, Testimonial, Ctasection } from '@/components/sections';
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
 
@@ -50,7 +50,7 @@ export default function Home() {
 
 //   const testimonials = [
 //     {
-//       name: "Virat Kohli",  
+//       name: "Virat Kohli",
 //       image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRqm3FRuMyJxozqZ5FpeE5EbgmAkRkX3LCc_AeaQp2jMMESpK8zI5fyh_RXhoTe2JI9XBd4_PKbsFDUlRc_YNWwdkblg6i6xHR07dTCyu8e1Q",
 //       text: "This app has completely transformed how I find parking in the city. No more driving around for 20 minutes looking for a spot!",
 //       rating: 4.8,
@@ -326,7 +326,7 @@ export default function Home() {
 //             </div>
 //           </div>
 //         </div>
-//       </section> 
+//       </section>
 
 //       <section ref={statsRef} className="stats-section py-16">
 //         <div className="container mx-auto px-4">

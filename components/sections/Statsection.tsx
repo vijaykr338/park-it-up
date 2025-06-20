@@ -4,7 +4,7 @@ import CountUp from "@/components/ui/count-up";
 const Statsection = () => {
   return (
     //   <section ref={statsRef} className="stats-section py-16">
-    <section className="stats-section p-8 sm:p-12 w-full bg-[#141a24]">
+    <section className="stats-section p-8 sm:p-12 w-full bg-[#0a121a]">
       <div className="container mx-auto px-4 max-w-7xl bg-[#232834] rounded-xl p-6 sm:p-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           <div className="text-gray-100">
