@@ -6,7 +6,7 @@ import Image from "next/image";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#141a24] text-white py-10 px-4 flex flex-col justify-between h-full">
+    <footer className="bg-[#0a121a] text-white py-10 px-4 flex flex-col justify-between h-full">
       <div className="bg-[#232834] rounded-3xl p-6">
         <div className="max-w-7xl mx-auto flex flex-col items-center">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-8 py-4 w-full">
@@ -28,7 +28,7 @@ const Footer = () => {
             <div className="flex flex-col items-start md:w-full">
               <div className="font-semibold mb-4 md:mb-6">ADDRESS</div>
               <p className="text-gray-400 text-md">
-                Delhi Technological University, Delhi, India -110042
+                811C, AB4, Delhi Technological University, Rohini, Delhi, India
               </p>
             </div>
             <div className="flex flex-row w-full ">
@@ -52,13 +52,10 @@ const Footer = () => {
               <div className="font-semibold mb-4 md:mb-6">CONTACT US</div>
               <ul className="text-gray-400 text-md space-y-1 flex flex-col gap-1">
                 <li>
-                  <a href="tel:+919757050071">+91 9757050071</a>
+                  <a href="tel:+919560967377">+91 9560967377</a>
                 </li>
                 <li>
-                  <a href="tel:+91797724623">+91 7977246237</a>
-                </li>
-                <li>
-                  <a href="mailto:parkitup@gmail.com">parkitup@gmail.com</a>
+                  <a href="mailto:officialparkitup@gmail.com">officialparkitup@gmail.com</a>
                 </li>
               </ul>
               <form className="relative w-full mt-4">
@@ -100,5 +97,6 @@ const Footer = () => {
     </footer>
   );
 };
+
 
 export default Footer;

@@ -9,23 +9,21 @@ import { Badge } from "@/components/ui/badge"
 const Herosection = () => {
     return (
         // <section ref={heroRef} className=" pt-24 pb-16 min-h-screen flex items-center">
-        <section className="w-full py-10 bg-[#141a24]">
+        // <section className="w-full py-10 bg-[#141a24]"> //change 1
+        <section className="w-full pb-20 bg-[#0a121a]">
             <div className="max-w-7xl container mx-auto flex items-center relative px-4 py-12 lg:py-0">
-                <div className="grid lg:grid-cols-2 items-center gap-8">
-                    <div className="hero-content">
-                        <Badge className="mb-6 bg-[#262a34] text-sm rounded-full font-semibold flex items-center justify-center">
+                <div className="grid lg:grid-cols-2 items-center gap-8 py-4">
+                    <div className="hero-content"><Badge className="mt-[2px] bg-[#262a34] text-sm rounded-full font-semibold flex items-center justify-center">
                             #Now in Delhi 🏙️
                         </Badge>
 
                         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gradient mb-6 leading-tight wipe-up">
                             In a Hurry? <br/>
-                            Just Park it Up!
+                            PARK It Up!
                         </h1>
 
                         <p className="text-md text-gradient2 mb-8 leading-tight w-full lg:w-2/3">
-                            The mobile parking app that is integrated with GPS that it can
-                            make it easier for you to find the nearest parking lot with a variety 
-                            of price ranges.
+                            PARK It Up is integrated with GPS, helping you instantly find the nearest available parking spots with real-time availability and a range of price options to suit your budget.
                         </p>
 
                         <div className="flex items-center gap-2 mb-8 w-full lg:w-3/4">
@@ -69,4 +67,4 @@ const Herosection = () => {
     )
 }
 
-export default Herosection
+export default Herosection;

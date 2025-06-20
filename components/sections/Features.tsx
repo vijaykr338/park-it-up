@@ -10,7 +10,7 @@ import Image from 'next/image';
 
 const Features = () => {
     return (
-        <section className="py-20 bg-[#141a24]">
+        <section className="py-20 bg-[#0a121a]">
             <div className="container mx-auto px-4 max-w-7xl">
                 <div className="flex flex-col lg:grid lg:grid-cols-2 gap-16 items-center">
                     <div className="relative h-[400px] sm:h-[500px] md:h-[600px] flex items-center justify-center mb-10 lg:mb-0">
@@ -29,8 +29,7 @@ const Features = () => {
                         <Badge className="mb-6 bg-[#232834] text-white h-6 rounded-full">Our best features for you 💎</Badge>
                         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gradient2 mb-6">THE SOLUTION TO YOUR PARKING PROBLEMS</h1>
                         <p className="text-md text-gray-400 mb-8">
-                            We are aware that many people have difficulty finding a parking space. We made a feature that can
-                            certainly solve your parking problems so far
+                            At PARK It Up, we understand the daily struggle of finding a parking spot. That&apos;s why we&apos;ve developed a smart solution designed to eliminate the hassle and make parking effortless.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <Card className="feature-card bg-[#232834] hover:scale-105 hover:bg-[#4d84a4] transition-all">
@@ -65,6 +64,7 @@ const Features = () => {
                                         </div>
                                         <div>
                                             <h3 className="text-md text-gray-100">Integrates with car sensor</h3>
+                                            <p className="text-sm text-gray-400 mt-1">With PARK It Up&apos;s powerful features, you&apos;ll enjoy a seamless parking experience—making it quicker and easier than ever to find the perfect spot.</p>
                                         </div>
                                     </div>
                                 </CardContent>

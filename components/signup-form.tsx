@@ -14,7 +14,7 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden p-0 bg-[#141a24]">
+      <Card className="overflow-hidden p-0 bg-[#0a121a]">
         <CardContent className="grid p-0 md:grid-cols-1">
           <form className="p-6 md:p-8">
             <div className="flex flex-col gap-6">

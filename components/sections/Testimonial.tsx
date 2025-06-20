@@ -16,7 +16,7 @@ import Marquee from '@/components/ui/marquee';
 
 const Testimonial = () => {
     return (
-        <section className="bg-[#141a24] py-20">
+        <section className="bg-[#0a121a] py-20">
             <div className="container mx-auto p-8 max-w-7xl rounded-xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div className="order-2 md:order-1">
                     <Marquee>
