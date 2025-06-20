@@ -1,8 +1,8 @@
 import React from "react";
 import { FaInstagram, FaFacebookF, FaGooglePlay } from "react-icons/fa";
 import { FaLinkedinIn } from "react-icons/fa6";
-import Logo from "@/components/assets/Parkitup_logo.png";
-import Image from "next/image";
+// import Logo from "@/components/assets/Parkitup_logo.png";
+// import Image from "next/image";
 
 const Footer = () => {
   return (
