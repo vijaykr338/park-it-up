@@ -14,9 +14,8 @@ const Ctasection = () => {
                 <div className="bg-[#4d84a4] rounded-2xl p-8 relative overflow-hidden">
                     <div className="max-w-7xl mx-auto">
                         <div className="grid lg:grid-cols-2 gap-12 items-center object-contain">
-                            <div className="text-center lg:text-left relative z-10">
-                                <Badge className="mb-6 bg-[#38708d] text-white rounded-full px-4 py-1">
-                                    App coming soon 🚀
+                            <div className="text-center lg:text-left relative z-10">                                <Badge className="mb-6 bg-[#38708d] text-white rounded-full px-4 py-1">
+                                    App Coming Soon 🚀
                                 </Badge>
 
                                 <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
@@ -31,8 +30,7 @@ const Ctasection = () => {
                                     <Input
                                         placeholder="Enter your email"
                                         className="flex-grow border-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent text-gray-100 h-12"
-                                    />
-                                    <Button className="px-8 h-12 rounded-full bg-black text-white hover:bg-gray-800 transition-colors">
+                                    />                                    <Button className="px-8 h-12 rounded-full bg-black text-white hover:bg-gray-800 transition-colors">
                                         Get Notified
                                     </Button>
                                 </div>

@@ -9,8 +9,7 @@ import CountUp from '@/components/ui/count-up';
 const About = () => {
   return (
     <div>
-      
-      <section className="relative bg-[#0a121a] flex min-h-screen items-center justify-center py-16 px-4">
+        <section className="relative bg-[#0a121a] flex min-h-screen items-center justify-center py-16 px-6 sm:px-8 lg:px-16">
         <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           {/* Left: Text Content */}
           <div>
@@ -38,10 +37,21 @@ const About = () => {
                 </div>
                 <div className="text-white/80 text-md md:text-lg">Customer satisfaction</div>
               </div>
-            </div>
-            <button className="px-8 py-3 rounded-xl bg-[#232834] border border-gray-600 text-white text-lg hover:bg-white hover:text-[#141a24] transition-colors font-semibold">Learn More</button>
+            </div>            <button className="px-8 py-3 rounded-xl bg-[#232834] border border-gray-600 text-white text-lg hover:bg-white hover:text-[#141a24] transition-colors font-semibold">Learn More</button>
           </div>
-          {/* Right: Image */}
+
+          {/* Mobile Image */}
+          <div className="block md:hidden mt-8">
+            <Image
+              src={Aboutus}
+              alt="hero image"
+              width={600}
+              height={400}
+              className="w-full h-auto object-contain rounded-lg"
+            />
+          </div>
+
+          {/* Desktop Image */}
           <div className="hidden md:block absolute top-0 right-0 h-full w-1/2">
             <Image
               src={Aboutus}

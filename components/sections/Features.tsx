@@ -27,19 +27,18 @@ const Features = () => {
 
                     <div>
                         <Badge className="mb-6 bg-[#232834] text-white h-6 rounded-full">Our best features for you 💎</Badge>
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gradient2 mb-6">THE SOLUTION TO YOUR PARKING PROBLEMS</h1>
-                        <p className="text-md text-gray-400 mb-8">
-                            At PARK It Up, we understand the daily struggle of finding a parking spot. That&apos;s why we&apos;ve developed a smart solution designed to eliminate the hassle and make parking effortless.
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gradient2 mb-6">THE SOLUTION TO YOUR PARKING PROBLEMS</h1>                        <p className="text-md text-gray-400 mb-8">
+                            We are aware that many people have difficulty finding a parking space. We made a feature that can
+                            certainly solve your parking problems so far
                         </p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-fit mx-auto lg:mx-0">
                             <Card className="feature-card bg-[#232834] hover:scale-105 hover:bg-[#4d84a4] transition-all">
                                 <CardContent className="">
                                     <div className="flex flex-col items-start gap-4">
                                         <div className="w-12 h-12 bg-gradient-to-b from-[#2b333b] from-10% to-[#384047] to-80% rounded-lg flex items-center justify-center">
                                             <LayoutGrid className="w-6 h-6 text-gray-400" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-md text-gray-100">Well organized information</h3>
+                                        </div>                                        <div>
+                                            <h3 className="text-md text-gray-100">Well Organized Information</h3>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -49,9 +48,8 @@ const Features = () => {
                                     <div className="flex flex-col items-start gap-4">
                                         <div className="w-12 h-12 bg-gradient-to-b from-[#2b333b] from-10% to-[#384047] to-80% rounded-lg flex items-center justify-center">
                                             <SiGooglemaps className="w-6 h-6 text-gray-400" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-md text-gray-100">Google Maps integration</h3>
+                                        </div>                                        <div>
+                                            <h3 className="text-md text-gray-100">Google Maps Integration</h3>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -61,11 +59,9 @@ const Features = () => {
                                     <div className="flex flex-col items-start gap-4">
                                         <div className="w-12 h-12 bg-gradient-to-b from-[#2b333b] from-10% to-[#384047] to-80% rounded-lg flex items-center justify-center">
                                             <FaCarOn className="w-6 h-6 text-gray-400" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-md text-gray-100">Integrates with car sensor</h3>
-                                            <p className="text-sm text-gray-400 mt-1">With PARK It Up&apos;s powerful features, you&apos;ll enjoy a seamless parking experience—making it quicker and easier than ever to find the perfect spot.</p>
-                                        </div>
+                                        </div>                        <div>
+                            <h3 className="text-md text-gray-100">Real Time Availability</h3>
+                        </div>
                                     </div>
                                 </CardContent>
                             </Card>

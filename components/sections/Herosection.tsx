@@ -4,16 +4,13 @@ import { Search, CircleCheckBig } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-// import ParkVisual from '@/components/assets/hero.png'
 
 const Herosection = () => {
-    return (
-        // <section ref={heroRef} className=" pt-24 pb-16 min-h-screen flex items-center">
-        // <section className="w-full py-10 bg-[#141a24]"> //change 1
-        <section className="w-full pb-20 bg-[#0a121a]">
-            <div className="max-w-7xl container mx-auto flex items-center relative px-4 py-12 lg:py-0">
-                <div className="grid lg:grid-cols-2 items-center gap-8 py-4">
-                    <div className="hero-content"><Badge className="mt-[2px] bg-[#262a34] text-sm rounded-full font-semibold flex items-center justify-center">
+    return (        <section className="w-full py-10 bg-[#0a121a]">
+            <div className="max-w-7xl container mx-auto flex items-center relative px-8 lg:px-12 py-12 lg:py-0">
+                <div className="grid lg:grid-cols-2 items-center gap-12 lg:gap-16">
+                    <div className="hero-content lg:pl-8">
+                        <Badge className="mb-6 bg-[#262a34] text-sm rounded-full font-semibold flex items-center justify-center">
                             #Now in Delhi 🏙️
                         </Badge>
 
@@ -45,8 +42,20 @@ const Herosection = () => {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <CircleCheckBig className="w-4 h-4 text-[#4d84a4]" />
-                                <span>Free trial 13 days</span>
+                                <span>Free to use</span>
                             </div>
+                        </div>
+                    </div>
+
+                    <div className="block lg:hidden mt-8 mb-8">
+                        <div>
+                            <Image
+                                src="/car_parking.svg"
+                                alt="Parking visualization"
+                                width={600}
+                                height={400}
+                                className="w-full h-auto"
+                            />
                         </div>
                     </div>
 

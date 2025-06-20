@@ -10,16 +10,7 @@ const Footer = () => {
       <div className="bg-[#232834] rounded-3xl p-6">
         <div className="max-w-7xl mx-auto flex flex-col items-center">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-8 py-4 w-full">
-            <div className="flex flex-col items-start w-full mx-auto">
-              <div className="text-3xl  font-bold">
-                <Image
-                  src={Logo}
-                  alt="ParkitUp Logo"
-                  height={50}
-                  width={200}
-                  className="h-18 w-auto"
-                />
-              </div>
+            <div className="flex flex-col items-start w-full mx-auto">              <h1 className="text-3xl font-bold">PARK It Up</h1>
               <p className="text-gray-400 lg:text-lg text-md mb-4 mt-2">
                 Curious about new developments and updates?
               </p>
@@ -73,9 +64,8 @@ const Footer = () => {
               </form>
             </div>
           </div>
-          <div className="w-full border-t border-gray-700 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 mt-4">
-            <span className="text-gray-400 text-xs text-center w-full md:w-auto">
-              © 2025 Park It Up. All rights reserved.
+          <div className="w-full border-t border-gray-700 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 mt-4">            <span className="text-gray-400 text-xs text-center w-full md:w-auto">
+              © 2025 PARK It Up. All rights reserved.
             </span>
             <div className="flex gap-4 mt-2 md:mt-0 justify-center w-full md:w-auto">
               <a href="#" className="text-gray-400 hover:text-white">
