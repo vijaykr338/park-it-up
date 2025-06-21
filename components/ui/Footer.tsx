@@ -1,5 +1,5 @@
 import React from "react";
-import { FaInstagram, FaFacebookF, FaGooglePlay } from "react-icons/fa";
+import { FaInstagram } from "react-icons/fa";
 import { FaLinkedinIn } from "react-icons/fa6";
 // import Logo from "@/components/assets/Parkitup_logo.png";
 // import Image from "next/image";
@@ -74,12 +74,6 @@ const Footer = () => {
               <a href="#" className="text-gray-400 hover:text-white">
                 <FaInstagram className="w-6 h-6" />
               </a>
-              {/* <a href="#" className="text-gray-400 hover:text-white">
-                <FaFacebookF className="w-6 h-6" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <FaGooglePlay className="w-6 h-6" />
-              </a> */}
             </div>
           </div>
         </div>

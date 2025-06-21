@@ -1,6 +1,6 @@
 import { SignupForm } from "@/components/signup-form";
-import Image from "next/image";
-import Parkitup_logo from "@/components/assets/Parkitup_logo.png";
+// import Image from "next/image";
+// import Parkitup_logo from "@/components/assets/Parkitup_logo.png";
 import Link from "next/link";
 
 export default function SignupPage() {
