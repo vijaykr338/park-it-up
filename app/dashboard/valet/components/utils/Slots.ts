@@ -1,0 +1,191 @@
+export const slots = [
+  {
+    id: 'P1',
+    status: 'inactive',
+    schedule: {
+      '10:00': 'Reserved',
+      '13:00': 'Reserved not checked in',
+      '15:00': 'Reserved',
+    },
+  },
+  {
+    id: 'P2',
+    status: 'inactive',
+    schedule: {
+      '09:00': 'Reserved',
+      '11:00': 'Reserved not checked in',
+    },
+  },
+  {
+    id: 'P3',
+    status: 'reserved not checked in',
+    schedule: {
+      '08:00': 'Reserved not checked in',
+      '12:00': 'Reserved',
+    },
+  },
+  {
+    id: 'P4',
+    status: 'reserved not checked in',
+   
+  },
+  {
+    id: 'P5',
+    status: 'inactive',
+  },
+  {
+    id: 'P6',
+    status: 'reserved',
+    schedule: {
+      '10:00': 'Reserved',
+      '14:00': 'Reserved',
+    },
+  },
+  {
+    id: 'P7',
+    status: 'reserved',
+    schedule: {
+      '12:00': 'Reserved not checked in',
+      '17:00': 'Reserved',
+    },
+  },
+  {
+    id: 'P8',
+    status: 'reserved',
+  },
+  {
+    id: 'P9',
+    status: 'inactive',
+  },
+  {
+    id: 'P10',
+    status: 'inactive',
+  },
+  {
+    id: 'P11',
+    status: 'inactive',
+  },
+  {
+    id: 'P12',
+    status: 'inactive',
+  },
+  {
+    id: 'P13',
+    status: 'overstay',
+    schedule: {
+      '08:00': 'Overstay',
+      '09:00': 'Overstay',
+    },
+  },
+  {
+    id: 'P14',
+    status: 'overstay',
+  },
+  {
+    id: 'P15',
+    status: 'inactive',
+  },
+  {
+    id: 'P16',
+    status: 'inactive',
+  },
+  {
+    id: 'P17',
+    status: 'reserved not checked in',
+    
+  },
+  {
+    id: 'P18',
+    status: 'reserved not checked in',
+    
+  },
+  {
+    id: 'P19',
+    status: 'inactive',
+  },
+  {
+    id: 'P20',
+    status: 'inactive',
+  },
+  {
+    id: 'P21',
+    status: 'inactive',
+  },
+  {
+    id: 'P22',
+    status: 'inactive',
+  },
+  {
+    id: 'P23',
+    status: 'reserved',
+  },
+  {
+    id: 'P24',
+    status: 'reserved',
+  },
+  {
+    id: 'P25',
+    status: 'inactive',
+  },
+  {
+    id: 'P26',
+    status: 'overstay',
+  },
+  {
+    id: 'P27',
+    status: 'overstay',
+  },
+  {
+    id: 'P28',
+    status: 'inactive',
+  },
+  {
+    id: 'P29',
+    status: 'inactive',
+  },
+  {
+    id: 'P30',
+    status: 'inactive',
+  },
+  {
+    id: 'P31',
+    status: 'inactive',
+  },
+  {
+    id: 'P32',
+    status: 'inactive',
+  },
+  {
+    id: 'P33',
+    status: 'inactive',
+  },
+  {
+    id: 'P34',
+    status: 'inactive',
+  },
+  {
+    id: 'P35',
+    status: 'inactive',
+  },
+  {
+    id: 'P36',
+    status: 'inactive',
+  },
+  {
+    id: 'P37',
+    status: 'inactive',
+  },
+  {
+    id: 'P38',
+    status: 'inactive',
+  },
+  {
+    id: 'P39',
+    status: 'inactive',
+  },
+  {
+    id: 'P40',
+    status: 'inactive',
+  },
+];
+
