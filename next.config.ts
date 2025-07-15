@@ -8,8 +8,7 @@ const nextConfig: NextConfig = {
       "hebbkx1anhila5yf.public.blob.vercel-storage.com",
       "encrypted-tbn0.gstatic.com",
       "encrypted-tbn1.gstatic.com",
-      "i0.wp.com",
-      "bugatti-newsroom.imgix.net"
+      "i0.wp.com"
     ]
   }
 };
