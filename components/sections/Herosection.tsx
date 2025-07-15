@@ -18,9 +18,9 @@ const Herosection = () => {
                             objectPosition: '80% center', // Move video further right
                             transform: 'translateX(15%)' // Increase rightward shift
                         }}
-                        src="/Comp_2.mp4"
+                        src="/Comp2_1.mp4"
                         autoPlay
-                        loop
+                        // loop
                         muted
                         playsInline
                     />
