@@ -1,4 +1,4 @@
-import React,{useRef} from 'react'
+import React from 'react'
 import image1 from "../assests/photo.jpg"
 import Car_details from './Cardetails'
 import { Searchbar } from './Searchbar'

@@ -73,13 +73,13 @@ const ContactInfoDialog: React.FC<ContactInfoDialogProps> = ({
                 <span className="font-medium">Texts from ParkItUp</span>
               </div>
               <p className="text-sm text-gray-500 mt-1">
-                You'll receive SMS messages from ParkItUp about your reservation.
+                You&apos;ll receive SMS messages from ParkItUp about your reservation.
               </p>
               <p className="text-xs text-gray-400 mt-2">
                 Message & data rates may apply. Message frequency varies. Reply STOP to opt out or HELP for help.
               </p>
               <p className="text-xs text-gray-400">
-                If you already opted out, you won't receive these messages.
+                If you already opted out, you won&apos;t receive these messages.
               </p>
             </div>
           </div>

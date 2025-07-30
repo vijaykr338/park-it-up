@@ -102,7 +102,7 @@ function ParkingCard({
         {/* Price */}
         <div className="text-center pt-1 border-t border-[#374151]">
           <div className="text-base font-bold text-[#e2e8f0]">
-            ${parking.price}
+            ₹{parking.price}
             <span className="text-xs text-[#9ca3af] font-normal">/hr</span>
           </div>
         </div>

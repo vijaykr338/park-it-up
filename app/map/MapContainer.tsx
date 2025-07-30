@@ -82,7 +82,7 @@ function ParkingMarker({ parking, isSelected, onClick }: ParkingMarkerProps) {
         )}
         
         <div className={getMarkerStyle()}>
-          ${parking.price}
+          ₹{parking.price}
         </div>
         
         {parking.availableSpots <= 3 && parking.availableSpots > 0 && (
@@ -237,7 +237,7 @@ export default function MapContainer({
         gestureHandling="greedy"
         disableDefaultUI={false}
         mapTypeControl={false}
-        colorScheme="LIGHT"
+        colorScheme="DARK"
         style={{ width: "100%", height: "100%" }}
         mapId={mapId}
         onCameraChanged={handleCameraChange}

@@ -55,7 +55,9 @@ export const Scheduleview: React.FC<Props> = ({ selectedSlotId }) => {
           {slots.map((slot) => (
             <th
               key={slot.id}
-              ref={(el) => (slotRefs.current[slot.id] = el)}
+              ref={(el) => {
+                slotRefs.current[slot.id] = el;
+              }}
               className={`border-b border-b-black border-r border-r-black text-xs w-[80px] min-w-[80px] max-w-[80px] p-2 ${
                 selectedSlotId === slot.id ? "bg-yellow-300" : "bg-white"
               }`}

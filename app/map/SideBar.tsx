@@ -161,7 +161,7 @@ function EnhancedParkingDetail({
         <div className="bg-[#2a3441] rounded-xl p-6 border border-[#374151]">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-3xl font-bold text-[#e2e8f0]">${parking.price}</div>
+              <div className="text-3xl font-bold text-[#e2e8f0]">₹{parking.price}</div>
               <div className="text-sm text-[#94a3b8]">per hour</div>
             </div>
           </div>
@@ -309,7 +309,7 @@ function EnhancedParkingList({
           </div>
           {/* Price */}
           <div className="text-right flex-shrink-0">
-            <div className="text-lg font-bold text-[#e2e8f0]">${location.price}</div>
+            <div className="text-lg font-bold text-[#e2e8f0]">₹{location.price}</div>
             <div className="text-xs text-[#94a3b8]">/hr</div>
           </div>
         </div>

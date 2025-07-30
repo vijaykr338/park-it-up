@@ -11,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import Image from 'next/image';
 import PAYTM from '../assets/paytm.png';
-import GPAY from '../assets/gpay.png';
+
 import GPAY_LOGO from '../assets/gpay_logo.png';
 
 interface PaymentMethod {

@@ -250,7 +250,7 @@ const BookingPage = () => {
                 </button>
 
                 <p className="text-xs text-gray-500 text-center">
-                  By purchasing, you agree to ParkItUp's Terms and Conditions
+                  By purchasing, you agree to ParkItUp&apos;s Terms and Conditions
                   and Privacy Policy
                 </p>
               </div>

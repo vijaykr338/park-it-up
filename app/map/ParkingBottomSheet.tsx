@@ -109,7 +109,7 @@ export default function ParkingBottomSheet({ parking, onClose }: ParkingBottomSh
             {/* Price */}
             <div className="text-center py-4 border-t border-[#374151]">
               <div className="text-3xl font-bold text-[#e2e8f0]">
-                ${parking.price}
+                ₹{parking.price}
                 <span className="text-lg text-[#9ca3af] font-normal">/hour</span>
               </div>
               <p className="text-sm text-[#9ca3af] mt-1">

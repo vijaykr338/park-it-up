@@ -1,7 +1,8 @@
+
 import React,{useState} from 'react'
 import Gridview from './Gridview';
 import { slots } from '../utils/Slots';
-import { Scheduleview } from './Scheduleview';
+
 const Accept = () => {
     const[showpopup,setShowpopup]=useState(false);
   return (
@@ -11,7 +12,8 @@ const Accept = () => {
         {
             showpopup &&(
                 <div className="fixed inset-0 bg-gray-400 bg-opacity-25 flex  flex-col items-center justify-center z-50 h-auto p-5">
-                    <Gridview slots={slots}/>
+                    {/* eslint-disable-next-line @typescript-eslint/no-unused-vars */}
+                    <Gridview slots={slots} onSlotClick={(slotId: string) => { /* handle slot click here */ }} />
                    <span> <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 align-middle mt-0">Assign this slot to the user</button>
                         <button
                         onClick={() => setShowpopup(false)}

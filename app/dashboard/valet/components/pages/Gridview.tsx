@@ -1,11 +1,7 @@
 "use client";
 import React from "react";
 
-type Slot = {
-  id: string;
-  status: string;
-  schedule?: Record<string, string>;
-};
+import { Slot } from "../types";
 
 type SlotMapProps = {
   slots: Slot[];
