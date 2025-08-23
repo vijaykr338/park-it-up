@@ -11,22 +11,15 @@ import Link from "next/link";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuthStore } from '@/lib/auth-store';
-
-interface FormData {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  password: string;
-  cnf_password: string;
-  email: string;
-}
-
+import { SignupPayload } from "@/lib/types";
+import { useMutation } from "@tanstack/react-query";
+import { signup } from "@/lib/api";
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<SignupPayload>({
     firstName: "",
     lastName: "",
     phone: "",
@@ -52,6 +45,36 @@ export function SignupForm({
     // At least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(password);
   }
+
+  const {mutate ,isPending} = useMutation({
+    mutationFn : signup,
+    onSuccess: async (data, variables) => {
+      try {
+        const loginRes = await axios.post("http://127.0.0.1:8000/api/user/login/", {
+          phone: variables.phone,
+          password: variables.password,
+        });
+  
+        if (loginRes.status === 200 && loginRes.data.access && loginRes.data.refresh) {
+          authLogin(loginRes.data.access, loginRes.data.refresh);
+          setError(null);
+          router.push("/Profile");
+        } else {
+          setError("Account created, but login failed. Please try logging in.");
+        }
+      } catch (loginErr: unknown) {
+        if (loginErr && typeof loginErr === 'object' && 'response' in loginErr) {
+          // @ts-expect-error
+          setError(loginErr.response?.data?.message || "Account created, but login failed.");
+        } else {
+          setError("Account created, but login failed.");
+        }
+      }
+    },
+    onError:(error)=>{
+      setError(error.message || "Signup Failed, try again");
+    }
+  })
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -82,51 +105,8 @@ export function SignupForm({
       return;
     }
 
-    try {
-      // Register user
-      const res = await axios.post("http://localhost:8000/user/signup/", {
-        firstname: firstName,
-        lastname: lastName,
-        email,
-        phone: phoneDigits,
-        password,
-      });
-
-      if (res.status === 201) {
-        // Auto-login after registration
-        try {
-          const loginRes = await axios.post("http://localhost:8000/user/login/", {
-            phone,
-            password,
-          });
-          if (loginRes.status === 200 && loginRes.data.access && loginRes.data.refresh) {
-            authLogin(loginRes.data.access, loginRes.data.refresh);
-            setError(null);
-            router.push("/Profile");
-          } else {
-            setError("Account created, but login failed. Please try logging in.");
-          }
-        } catch (loginErr: unknown) {
-          if (loginErr && typeof loginErr === 'object' && 'response' in loginErr) {
-            // @ts-expect-error: loginErr.response may not be typed
-            setError(loginErr.response?.data?.message || "Account created, but login failed. Please try logging in.");
-          } else {
-            setError("Account created, but login failed. Please try logging in.");
-          }
-        }
-      } else {
-        setError("Error creating account");
-      }
-    } catch (err: unknown) {
-      console.error("Signup error:", err);
-      if (err && typeof err === 'object' && 'response' in err) {
-        // @ts-expect-error: err.response may not be typed
-        setError(err.response?.data?.message || "An error occurred while creating account");
-      } else {
-        setError("An error occurred while creating account");
-      }
-    }
-  };
+    mutate(formData);
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

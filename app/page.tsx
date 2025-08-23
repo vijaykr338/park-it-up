@@ -3,6 +3,7 @@ import { Herosection, Statsection, Features, Testimonial, Ctasection } from '@/c
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
 
+
 export default function Home() {
   return (
     <main>
@@ -15,6 +16,7 @@ export default function Home() {
       
       <Footer />
     </main>
+   
   );
 }
 

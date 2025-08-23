@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label"
 import Link from 'next/link'
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
 import { useAuthStore } from '@/lib/auth-store';
+import {login} from "@/lib/api"
+import { useMutation } from "@tanstack/react-query"
 
 export function LoginForm({
   className,
@@ -24,6 +25,16 @@ export function LoginForm({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const {mutate,isPending}= useMutation({
+    mutationFn : login,
+    onError : (error) => setError(error.message),
+    onSuccess : (data)=>{
+      authLogin(data.access,data.refresh);
+        setError(null);
+        router.push('/Profile');
+    }
+  })
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
@@ -37,22 +48,8 @@ export function LoginForm({
       setError('Please fill all fields');
       return;
     }
-    try {
-      const res = await axios.post('http://localhost:8000/user/login/', {
-        phone: phoneDigits,
-        password: formData.password,
-      });
-      if (res.status === 200 && res.data.access && res.data.refresh) {
-        authLogin(res.data.access, res.data.refresh);
-        setError(null);
-        router.push('/Profile');
-      } else {
-        setError('Invalid credentials');
-      }
-    } catch (err: unknown) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setError((err as any)?.response?.data?.message || 'Login failed');
-    }
+   
+    mutate({...formData})
   };
 
   return (
@@ -105,7 +102,7 @@ export function LoginForm({
                 />
               </div>
               <Button type="submit" className="w-full bg-[#4d84a4] hover:bg-slate-700 border border-white">
-                Login
+                {isPending? `Letting you in` : `Login`}
               </Button>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-[#141a24] text-white relative z-10 px-2">
