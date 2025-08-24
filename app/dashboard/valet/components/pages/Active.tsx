@@ -22,8 +22,6 @@ export const ActiveReservations = () => {
         <div className='flex flex-row gap-10 items-center justify-center'>
          <Car_details/>
         <button className='bg-orange-300 border-2 text-white rounded-md p-2 cursor-pointer hover:scale-105 transition-transform duration-200 '>Check-out</button>
-         <button className='bg-red-400 border-2  text-white rounded-md p-2 cursor-pointer hover:scale-105 transition-transform duration-200 '>Extend</button>
-          <Accept/>
         </div>
       </div>
     </div>

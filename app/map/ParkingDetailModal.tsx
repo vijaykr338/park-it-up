@@ -177,7 +177,7 @@ export default function ParkingDetailModal({
             <div className="flex justify-between items-center mb-2">
               <span className="text-[#94a3b8] text-sm">Reservation</span>
               <span className="text-[#e2e8f0] font-bold text-lg">
-                ${parking.price}
+                ₹{parking.price}
               </span>
             </div>
             <div className="text-xs text-[#94a3b8]">Duration: 10 hours</div>
@@ -223,9 +223,9 @@ export default function ParkingDetailModal({
           </div>
 
           {/* Book Now Button */}
-          <Link href="/booking">
+          <Link href={`/booking/select-slot?parkingId=${parking.id}`}>
             <button className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white font-semibold py-3 rounded-xl text-base transition-colors duration-200 mt-2">
-              Book Now - ${parking.price}
+              Book Now - ₹{parking.price}
             </button>
           </Link>
         </div>

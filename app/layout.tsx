@@ -1,8 +1,8 @@
 
 import type { Metadata } from 'next'
 import './globals.css'
-// import Navbar from '@/components/ui/Navbar';
-// import Footer from '@/components/ui/Footer';
+import ThemeProviderClient from './ThemeProviderClient'
+import DemoProvider from './DemoProvider'
 
 export const metadata: Metadata = {
   title: 'ParkItUp'
@@ -16,9 +16,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* <Navbar/> */}
-        {children} 
-        {/* <Footer/> */}
+        <ThemeProviderClient>
+          <DemoProvider>
+            <div className="min-h-screen w-full p-0 m-0 bg-gradient-to-b from-[#071939] to-[#05233a]">
+              {children}
+            </div>
+          </DemoProvider>
+        </ThemeProviderClient>
       </body>
     </html>
   )

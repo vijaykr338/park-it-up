@@ -1,49 +1,23 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSearch, FaArrowLeft } from "react-icons/fa";
-import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import Image from "next/image";
 import "./sidebar-scrollbar.css";
-// import ParkingList from "./ParkingList"; // Removed unused import
-import ParkingDetail from "./ParkingDetail";
-import { useQueryParams } from "./useQueryParams";
-import { ParkingLocation, ParkingPlace, PlaceSelect, AutocompleteSuggestion } from "./types";
-
-// --- Type Definitions for Google API responses to avoid 'any' ---
-interface GooglePlacePhoto {
-  name: string;
-  getURI: (options: { maxWidth: number; maxHeight: number }) => string;
-}
-
-interface GooglePlaceSearchResult {
-  id: string;
-  displayName?: string;
-  formattedAddress?: string;
-  location: {
-    lat: number | (() => number);
-    lng: number | (() => number);
-  };
-  rating?: number;
-  priceLevel?: number;
-  photos?: GooglePlacePhoto[];
-}
-// ---
+import { ParkingLocation } from "./types";
+import LocationSelector from "./LocationSelector";
 
 interface SideBarProps {
-  onPlaceSelect?: (place: PlaceSelect) => void;
-  // setShowSidebar prop was unused
   activeTab?: 'list' | 'map';
   setActiveTab?: (tab: 'list' | 'map') => void;
   partialMode?: boolean;
-  onParkingLocationsUpdate?: (locations: ParkingLocation[]) => void;
   onParkingSelect?: (parking: ParkingLocation) => void;
   selectedParking?: ParkingLocation | null;
   onCloseDetail?: () => void;
   parkingLocations?: ParkingLocation[];
+  onSearch?: (query: string) => void;
+  currentLocation?: string;
+  onLocationChange?: (locationId: string) => void;
 }
 
-// type ParkingLocationWithPhotos = ParkingLocation & { photoUrls?: string[] }; // Removed unused type
-
-// Enhanced Parking Detail Component for Desktop
 function EnhancedParkingDetail({
   parking,
   onClose
@@ -107,7 +81,7 @@ function EnhancedParkingDetail({
                 alt={parking.name}
                 className="object-cover w-64 h-48 rounded-xl flex-shrink-0"
                 onError={e => {
-                  const target = e.currentTarget;
+                  const target = e.currentTarget as HTMLImageElement;
                   if (target.src !== fallbackImg) target.src = fallbackImg;
                 }}
               />
@@ -161,7 +135,7 @@ function EnhancedParkingDetail({
         <div className="bg-[#2a3441] rounded-xl p-6 border border-[#374151]">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-3xl font-bold text-[#e2e8f0]">${parking.price}</div>
+              <div className="text-3xl font-bold text-[#e2e8f0]">₹{parking.price}</div>
               <div className="text-sm text-[#94a3b8]">per hour</div>
             </div>
           </div>
@@ -268,7 +242,7 @@ function EnhancedParkingList({
         <div className="text-[#94a3b8] text-center py-12">
           <div className="text-4xl mb-4">🅿️</div>
           <div className="text-lg font-medium mb-2">No parking found</div>
-          <div className="text-sm">Try searching for a different location</div>
+          <div className="text-sm">Try a different search term.</div>
         </div>
       )}
       {locations.map((location) => (
@@ -309,7 +283,7 @@ function EnhancedParkingList({
           </div>
           {/* Price */}
           <div className="text-right flex-shrink-0">
-            <div className="text-lg font-bold text-[#e2e8f0]">${location.price}</div>
+            <div className="text-lg font-bold text-[#e2e8f0]">₹{location.price}</div>
             <div className="text-xs text-[#94a3b8]">/hr</div>
           </div>
         </div>
@@ -319,24 +293,18 @@ function EnhancedParkingList({
 }
 
 export default function SideBar({
-  onPlaceSelect,
   activeTab,
   setActiveTab,
   partialMode = false,
-  onParkingLocationsUpdate,
   onParkingSelect,
   selectedParking,
   onCloseDetail,
-  parkingLocations: parkingLocationsProp
+  parkingLocations: parkingLocationsProp = [],
+  onSearch,
+  currentLocation,
+  onLocationChange
 }: SideBarProps) {
-  const places = useMapsLibrary("places");
-  const [suggestions, setSuggestions] = useState<AutocompleteSuggestion[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  // const [parkingPlaces, setParkingPlaces] = useState<ParkingPlace[]>([]); // Unused state removed
-  const [parkingLocations, setParkingLocations] = useState<ParkingLocation[]>([]);
-  const [selectedPlace, setSelectedPlace] = useState<ParkingPlace | null>(null);
-  const { lat, lng } = useQueryParams();
 
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -350,129 +318,10 @@ export default function SideBar({
   const tab = isMobile ? (activeTab ?? internalTab) : 'list';
   const setTab = isMobile ? (setActiveTab ?? setInternalTab) : () => { };
 
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setInputValue(query);
-    if (!places || query.length < 3) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
-    try {
-      const { suggestions: autocompleteSuggestions } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-        input: query,
-        locationBias: { lat: 28.7041, lng: 77.1025 },
-        includedPrimaryTypes: ["establishment", "geocode"],
-        language: "en",
-        region: "IN"
-      });
-      setSuggestions((autocompleteSuggestions || []).filter(s => s.placePrediction !== null) as AutocompleteSuggestion[]);
-      setShowSuggestions(true);
-    } catch {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
-  };
-
-  const convertToEnhancedParkingLocations = async (searchResults: GooglePlaceSearchResult[]): Promise<ParkingLocation[]> => {
-    return Promise.all(searchResults.map(async (p, index: number) => {
-      const lat = typeof p.location.lat === 'function' ? p.location.lat() : p.location.lat;
-      const lng = typeof p.location.lng === 'function' ? p.location.lng() : p.location.lng;
-
-      let photoUrl: string | undefined = undefined;
-      if (p.photos && p.photos.length > 0) {
-        try {
-          photoUrl = p.photos[0].getURI({ maxWidth: 400, maxHeight: 400 });
-        } catch {
-          if (p.photos[0].name) {
-            const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-            photoUrl = `https://places.googleapis.com/v1/${p.photos[0].name}/media?maxHeightPx=400&maxWidthPx=400&key=${apiKey}`;
-          }
-        }
-      }
-
-      const basePrice = 15 + Math.floor(Math.random() * 50);
-      const rating = Number((3.5 + Math.random() * 1.5).toFixed(1));
-      const reviewCount = 50 + Math.floor(Math.random() * 300);
-      const walkingTime = 2 + Math.floor(Math.random() * 15);
-      const availableSpots = Math.floor(Math.random() * 20);
-      const totalSpots = availableSpots + Math.floor(Math.random() * 30);
-
-      let category: ParkingLocation['category'] = undefined;
-      if (index === 0) category = 'best-value';
-      else if (index === 1) category = 'shortest-walk';
-      else if (index === 2) category = 'highest-rated';
-
-      return {
-        id: p.id,
-        name: p.displayName || 'Parking Lot',
-        address: p.formattedAddress || 'Address not available',
-        price: basePrice,
-        rating,
-        reviewCount,
-        walkingTime,
-        walkingDistance: `${(walkingTime * 0.05).toFixed(1)}mi`,
-        availableSpots,
-        totalSpots,
-        location: { lat, lng },
-        photoUrl,
-        category,
-        features: ['Security Camera', 'Covered', 'EV Charging'].slice(0, Math.floor(Math.random() * 3) + 1)
-      };
-    }));
-  };
-  
-  // FIX: Wrapped update function in useCallback to stabilize it for useEffect dependency array
-  const updateParkingLocations = useCallback((newLocations: ParkingLocation[]) => {
-    setParkingLocations(newLocations);
-    onParkingLocationsUpdate?.(newLocations);
-  }, [onParkingLocationsUpdate]);
-
-
-  const handleSuggestionClick = async (suggestion: AutocompleteSuggestion) => {
-    if (!places) return;
-    try {
-      const { places: placeResults } = await places.Place.searchByText({
-        textQuery: suggestion.placePrediction.text.text,
-        fields: ["id", "displayName", "location", "formattedAddress", "rating", "priceLevel", "photos"],
-        locationBias: { lat: 28.7041, lng: 77.1025 }
-      });
-
-      if (!placeResults || placeResults.length === 0 || !placeResults[0].location) {
-        updateParkingLocations([]);
-        setShowSuggestions(false);
-        return;
-      }
-
-      const center = placeResults[0].location;
-
-      onPlaceSelect?.({
-        name: placeResults[0].displayName ?? "",
-        location: center,
-        formatted_address: placeResults[0].formattedAddress ?? "",
-        place_id: placeResults[0].id
-      });
-
-      const { places: searchResults } = await places.Place.searchNearby({
-        locationRestriction: { center, radius: 1000 },
-        includedTypes: ["parking"],
-        fields: ["id", "displayName", "location", "formattedAddress", "rating", "priceLevel", "photos"],
-        maxResultCount: 20
-      });
-
-      if (searchResults && searchResults.length > 0) {
-        const enhancedMapped = await convertToEnhancedParkingLocations(searchResults as GooglePlaceSearchResult[]);
-        updateParkingLocations(enhancedMapped);
-        setShowSuggestions(false);
-      } else {
-        updateParkingLocations([]);
-        setShowSuggestions(false);
-      }
-    } catch (error) {
-      console.error("Error in handleSuggestionClick:", error);
-      updateParkingLocations([]);
-      setShowSuggestions(false);
-    }
+    onSearch?.(query);
   };
 
   const handleEnhancedParkingSelect = (location: ParkingLocation) => {
@@ -480,71 +329,36 @@ export default function SideBar({
   };
 
   const handleCloseDetail = () => {
-    setSelectedPlace(null);
     onCloseDetail?.();
   };
-
-  useEffect(() => {
-    if (!places || !lat || !lng || isNaN(Number(lat)) || isNaN(Number(lng))) return;
-    (async () => {
-      const center = { lat: Number(lat), lng: Number(lng) };
-      onPlaceSelect?.({ location: { lat: () => center.lat, lng: () => center.lng } });
-      try {
-        const { places: searchResults } = await places.Place.searchNearby({
-          locationRestriction: { center, radius: 1000 },
-          includedTypes: ["parking"],
-          fields: ["id", "displayName", "location", "formattedAddress", "rating", "priceLevel", "photos"],
-          maxResultCount: 20
-        });
-        if (searchResults && searchResults.length > 0) {
-          const enhancedMapped = await convertToEnhancedParkingLocations(searchResults as GooglePlaceSearchResult[]);
-          updateParkingLocations(enhancedMapped);
-        } else {
-          updateParkingLocations([]);
-        }
-      } catch (error) {
-        console.error("Error in auto-search:", error);
-        updateParkingLocations([]);
-      }
-    })();
-  // FIX: Added 'updateParkingLocations' to dependency array
-  }, [places, lat, lng, onPlaceSelect, updateParkingLocations]);
 
   if (partialMode) {
     return (
       <div className="w-full bg-[#151823] px-6 py-4 rounded-t-2xl">
         <SideBarHeader isMobile={isMobile} tab={tab} setTab={setTab} partialMode={true} />
+        
+        {/* Location Selector */}
+        {currentLocation && onLocationChange && (
+          <div className="mb-3">
+            <LocationSelector 
+              currentLocation={currentLocation}
+              onLocationChange={onLocationChange}
+              className="mb-3"
+            />
+          </div>
+        )}
+        
         <div className="relative">
           <div className="flex items-center bg-[#2a2f3e] rounded-2xl px-5 py-4 border border-[#374151] focus-within:ring-2 focus-within:ring-[#3b82f6]/60 focus-within:border-[#3b82f6]/60 transition-all">
             <FaSearch className="text-[#94a3b8] w-5 h-5 mr-4" />
             <input
               type="text"
               value={inputValue}
-              placeholder="Where are you going?"
+              placeholder="Search parking..."
               onChange={handleInputChange}
               className="bg-transparent outline-none text-[#e2e8f0] placeholder-[#94a3b8] flex-1 text-base"
             />
           </div>
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-[#2a2f3e] border border-[#374151] rounded-2xl shadow-2xl max-h-60 overflow-y-auto z-50">
-              {suggestions.map((suggestion, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleSuggestionClick(suggestion)}
-                  className="p-4 hover:bg-[#374151] cursor-pointer text-[#e2e8f0] border-b border-[#374151] last:border-b-0 transition-colors"
-                >
-                  <div className="font-medium">
-                    {suggestion.placePrediction?.text?.text || 'Unknown'}
-                  </div>
-                  {suggestion.placePrediction?.structuredFormat?.secondaryText && (
-                    <div className="text-sm text-[#94a3b8] mt-1">
-                      {suggestion.placePrediction.structuredFormat.secondaryText.text}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     );
@@ -563,48 +377,37 @@ export default function SideBar({
     );
   }
 
-  const parkingLocationsToShow = parkingLocationsProp ?? parkingLocations;
-
   return (
     <aside className="h-full max-h-full sm:max-h-[92vh] w-full flex-none bg-[#151823] rounded-2xl shadow-2xl flex flex-col px-6 py-6 border border-[#23263a] relative">
       <SideBarHeader isMobile={isMobile} tab={tab} setTab={setTab} partialMode={false} />
+      
+      {/* Location Selector */}
+      {currentLocation && onLocationChange && (
+        <div className="mb-4">
+          <LocationSelector 
+            currentLocation={currentLocation}
+            onLocationChange={onLocationChange}
+          />
+        </div>
+      )}
+      
       <div className="mb-6 relative">
         <div className="flex items-center bg-[#2a2f3e] rounded-xl px-3 py-2 border border-[#374151] focus-within:ring-2 focus-within:ring-[#3b82f6]/60 focus-within:border-[#3b82f6]/60 transition-all">
           <FaSearch className="text-[#94a3b8] w-4 h-4 mr-2" />
           <input
             type="text"
             value={inputValue}
-            placeholder="Where are you going?"
+            placeholder="Search parking..."
             onChange={handleInputChange}
             className="bg-transparent outline-none text-[#e2e8f0] placeholder-[#94a3b8] flex-1 text-sm"
           />
         </div>
-        {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-[#2a2f3e] border border-[#374151] rounded-2xl shadow-2xl max-h-60 overflow-y-auto z-50">
-            {suggestions.map((suggestion, index) => (
-              <div
-                key={index}
-                onClick={() => handleSuggestionClick(suggestion)}
-                className="p-4 hover:bg-[#374151] cursor-pointer text-[#e2e8f0] border-b border-[#374151] last:border-b-0 transition-colors"
-              >
-                <div className="font-medium">
-                  {suggestion.placePrediction?.text?.text || 'Unknown'}
-                </div>
-                {suggestion.placePrediction?.structuredFormat?.secondaryText && (
-                  <div className="text-sm text-[#94a3b8] mt-1">
-                    {suggestion.placePrediction.structuredFormat.secondaryText.text}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
       {(tab === 'list') && (
         <>
           <div className="mb-6 flex justify-between items-center">
             <div className="text-[#94a3b8] text-sm">
-              {parkingLocationsToShow.length} spots found
+              {parkingLocationsProp.length} spots found
             </div>
             <select className="bg-[#2a2f3e] text-[#e2e8f0] border border-[#374151] rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/60">
               <option value="popularity">Sort by Popularity</option>
@@ -613,20 +416,10 @@ export default function SideBar({
             </select>
           </div>
           <EnhancedParkingList
-            locations={parkingLocationsToShow}
+            locations={parkingLocationsProp}
             onSelect={handleEnhancedParkingSelect}
             selectedId={selectedParking?.id}
           />
-          <div className="absolute inset-0 pointer-events-none">
-            <div
-              className={`absolute top-0 left-0 h-full w-full transition-transform duration-300 z-40 ${selectedPlace ? 'translate-x-0' : '-translate-x-full'} pointer-events-auto`}
-              style={{ maxWidth: '100%' }}
-            >
-              {selectedPlace && (
-                <ParkingDetail place={selectedPlace} onClose={handleCloseDetail} />
-              )}
-            </div>
-          </div>
         </>
       )}
     </aside>

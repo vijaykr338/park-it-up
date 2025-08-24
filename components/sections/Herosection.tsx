@@ -59,10 +59,12 @@ const Herosection = () => {
                         style={{
                             background: `
                                 linear-gradient(to bottom, 
-                                    rgba(10, 18, 26, 0.8) 0%, 
-                                    transparent 25%, 
-                                    transparent 75%, 
-                                    rgba(10, 18, 26, 0.8) 100%
+                                    rgba(10, 18, 26, 0.85) 0%,      /* Slightly reduced vignette at top */
+                                    rgba(10, 18, 26, 0.6) 14%,      /* Less coverage downward */
+                                    rgba(10, 18, 26, 0.3) 28%,      /* Softer transition */
+                                    transparent 48%,                /* Fade out to transparent earlier */
+                                    transparent 80%,                /* Keep most of section clear */
+                                    rgba(10, 18, 26, 0.8) 100%      /* Vignette at bottom */
                                 ),
                                 linear-gradient(to right, 
                                     rgba(10, 18, 26, 0.3) 0%, 

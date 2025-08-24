@@ -101,21 +101,13 @@ function ParkingCard({
         </div>
         {/* Price */}
         <div className="text-center pt-1 border-t border-[#374151]">
-          <div className="text-base font-bold text-[#e2e8f0]">
-            ${parking.price}
-            <span className="text-xs text-[#9ca3af] font-normal">/hr</span>
+            <div className="text-base font-bold text-[#e2e8f0]">
+              ₹{parking.price}
+              <span className="text-xs text-[#9ca3af] font-normal">/hr</span>
           </div>
         </div>
         {/* Book Now Button */}
-        <button
-          onClick={e => {
-            e.stopPropagation();
-            onTap();
-          }}
-          className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white font-medium py-1 px-2 rounded-lg transition-colors text-xs mt-1"
-        >
-          Book Now
-        </button>
+  <a href={`/booking/select-slot?parkingId=${parking.id}`} onClick={e => e.stopPropagation()} className="w-full inline-block text-center bg-[#60a5fa] hover:bg-[#3b82f6] text-white font-medium py-1 px-2 rounded-lg transition-colors text-xs mt-1">Book Now</a>
       </div>
     </div>
   );

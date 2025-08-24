@@ -1,28 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { Map, AdvancedMarker, useMapsLibrary } from "@vis.gl/react-google-maps";
-import { ParkingLocation, PlaceSelect } from "./types";
+import { Map, AdvancedMarker } from "@vis.gl/react-google-maps";
+import { ParkingLocation } from "./types";
 
 const mapId = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID;
-
-// --- Type Definitions for Google API responses to avoid 'any' ---
-interface GooglePlacePhoto {
-  name: string;
-  getURI: (options: { maxWidth: number; maxHeight: number }) => string;
-}
-
-interface GooglePlaceSearchResult {
-  id: string;
-  displayName?: string;
-  formattedAddress?: string;
-  location: {
-    lat: number | (() => number);
-    lng: number | (() => number);
-  };
-  rating?: number;
-  priceLevel?: number;
-  photos?: GooglePlacePhoto[];
-}
-// ---
 
 interface ParkingMarkerProps {
   parking: ParkingLocation;
@@ -32,7 +12,15 @@ interface ParkingMarkerProps {
 
 function ParkingMarker({ parking, isSelected, onClick }: ParkingMarkerProps) {
   // Responsive: smaller marker for mobile
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsMobile(window.innerWidth < 640);
+      const handleResize = () => setIsMobile(window.innerWidth < 640);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   const getMarkerStyle = () => {
     const baseStyle = isMobile
@@ -82,7 +70,7 @@ function ParkingMarker({ parking, isSelected, onClick }: ParkingMarkerProps) {
         )}
         
         <div className={getMarkerStyle()}>
-          ${parking.price}
+          ₹{parking.price}
         </div>
         
         {parking.availableSpots <= 3 && parking.availableSpots > 0 && (
@@ -95,111 +83,18 @@ function ParkingMarker({ parking, isSelected, onClick }: ParkingMarkerProps) {
   );
 }
 
-function NearbySearch({ 
-  center, 
-  onParkingLotsFound 
-}: { 
-  center: { lat: number; lng: number }; 
-  onParkingLotsFound: (lots: ParkingLocation[]) => void;
-}) {
-  const places = useMapsLibrary("places");
-
-  useEffect(() => {
-    if (!places) return;
-
-    const searchNearby = async () => {
-      try {
-        const { places: nearbyPlaces } = await places.Place.searchNearby({
-          locationRestriction: {
-            center: { lat: center.lat, lng: center.lng },
-            radius: 1000
-          },
-          includedTypes: ['parking'],
-          fields: ['id', 'displayName', 'location', 'formattedAddress', 'rating', 'priceLevel', 'photos'],
-          maxResultCount: 20
-        });
-
-        if (nearbyPlaces && nearbyPlaces.length > 0) {
-          const mappedParkingLots = await Promise.all(
-            // FIXED: Replaced 'any' with the specific 'GooglePlaceSearchResult' type
-            (nearbyPlaces as GooglePlaceSearchResult[]).map(async (place, index: number) => {
-              const lat = typeof place.location.lat === 'function' ? place.location.lat() : place.location.lat;
-              const lng = typeof place.location.lng === 'function' ? place.location.lng() : place.location.lng;
-              
-              let photoUrl: string | undefined = undefined;
-              if (place.photos && place.photos.length > 0) {
-                try {
-                  photoUrl = place.photos[0].getURI({ maxWidth: 400, maxHeight: 400 });
-                } catch {
-                  if (place.photos[0].name) {
-                    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-                    photoUrl = `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxHeightPx=400&maxWidthPx=400&key=${apiKey}`;
-                  }
-                }
-              }
-
-              const basePrice = 15 + Math.floor(Math.random() * 50);
-              const rating = Number((3.5 + Math.random() * 1.5).toFixed(1));
-              const reviewCount = 50 + Math.floor(Math.random() * 300);
-              const walkingTime = 2 + Math.floor(Math.random() * 15);
-              const availableSpots = Math.floor(Math.random() * 20);
-              const totalSpots = availableSpots + Math.floor(Math.random() * 30);
-
-              let category: ParkingLocation['category'] = undefined;
-              if (index === 0) category = 'best-value';
-              else if (index === 1) category = 'shortest-walk';
-              else if (index === 2) category = 'highest-rated';
-
-              return {
-                id: place.id,
-                name: place.displayName || 'Parking Lot',
-                address: place.formattedAddress || 'Address not available',
-                price: basePrice,
-                rating,
-                reviewCount,
-                walkingTime,
-                walkingDistance: `${(walkingTime * 0.05).toFixed(1)}mi`,
-                availableSpots,
-                totalSpots,
-                location: { lat, lng },
-                photoUrl,
-                category,
-                features: ['Security Camera', 'Covered', 'EV Charging'].slice(0, Math.floor(Math.random() * 3))
-              };
-            })
-          );
-
-          onParkingLotsFound(mappedParkingLots);
-        } else {
-          onParkingLotsFound([]);
-        }
-      } catch (error) {
-        console.error('Nearby search failed:', error);
-        onParkingLotsFound([]);
-      }
-    };
-
-    searchNearby();
-  }, [places, center, onParkingLotsFound]);
-
-  return null;
-}
-
 export default function MapContainer({ 
   center, 
-  // onPlaceSelect,
   parkingLocations, 
   selectedParking, 
   onParkingSelect 
 }: { 
   center: { lat: number; lng: number };
-  onPlaceSelect: (place: PlaceSelect) => void;
   parkingLocations: ParkingLocation[];
   selectedParking: ParkingLocation | null;
   onParkingSelect: (parking: ParkingLocation) => void;
 }) {
   const [mapCenter, setMapCenter] = useState(center);
-  const [nearbyParkingLots, setNearbyParkingLots] = useState<ParkingLocation[]>([]);
 
   useEffect(() => {
     setMapCenter(center);
@@ -218,36 +113,20 @@ export default function MapContainer({
     onParkingSelect(parking);
   }, [onParkingSelect]);
 
-  const handleNearbyParkingFound = useCallback((lots: ParkingLocation[]) => {
-    setNearbyParkingLots(lots);
-  }, []);
-
-  const allParkingLocations = [
-    ...parkingLocations,
-    ...nearbyParkingLots.filter(nearby => 
-      !parkingLocations.some(existing => existing.id === nearby.id)
-    )
-  ];
-
   return (
     <div className="relative w-full h-full">
       <Map
         center={mapCenter}
-        defaultZoom={16} // Increased from 14 to 16 for a closer initial view
+        defaultZoom={16}
         gestureHandling="greedy"
         disableDefaultUI={false}
         mapTypeControl={false}
-        colorScheme="LIGHT"
+        colorScheme="DARK" // Enable dark mode
         style={{ width: "100%", height: "100%" }}
         mapId={mapId}
         onCameraChanged={handleCameraChange}
       >
-        <NearbySearch 
-          center={mapCenter} 
-          onParkingLotsFound={handleNearbyParkingFound} 
-        />
-        
-        {allParkingLocations.map((parking) => (
+        {parkingLocations.map((parking) => (
           <ParkingMarker
             key={parking.id}
             parking={parking}

@@ -1,0 +1,44 @@
+[
+  {
+    "business_status": "OPERATIONAL",
+    "geometry": {
+      "location": {
+        "lat": 28.6328,
+        "lng": 77.2197
+      },
+      "viewport": {
+        "northeast": {
+          "lat": 28.6341489802915,
+          "lng": 77.2210489802915
+        },
+        "southwest": {
+          "lat": 28.6314510197085,
+          "lng": 77.2183510197085
+        }
+      }
+    },
+    "icon": "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/parking-71.png",
+    "icon_background_color": "#7B9EB0",
+    "icon_mask_base_uri": "https://maps.gstatic.com/mapfiles/place_api/icons/v2/parking_pinlet",
+    "name": "Connaught Place Parking",
+    "place_id": "ChIJexample123",
+    "plus_code": {
+      "compound_code": "J6M9+87 New Delhi, Delhi",
+      "global_code": "7JWVJ6M9+87"
+    },
+    "rating": 4.1,
+    "reference": "ChIJexample123",
+    "scope": "GOOGLE",
+    "types": ["parking", "point_of_interest", "establishment"],
+    "user_ratings_total": 89,
+    "vicinity": "Connaught Place, New Delhi",
+    "photos": [
+      {
+        "height": 3000,
+        "html_attributions": ["<a href=\"https://maps.google.com/maps/contrib/example\">Example User</a>"],
+        "photo_reference": "example_photo_reference_string",
+        "width": 4000
+      }
+    ]
+  }
+]

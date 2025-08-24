@@ -1,35 +1,41 @@
 "use client";
-import React, { useState } from "react";
-import { Scheduleview } from "./Scheduleview";
+import React from "react";
 import Gridview from "./Gridview";
-import { slots } from "../utils/Slots";
+import AssignOfflineDialog from './AssignOfflineDialog'
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { useDemo } from '../../../../DemoProvider';
 
 const Valet_Parking = () => {
-  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
-  const [view, setView] = useState<"grid" | "schedule">("grid");
+  const { slots, assignSlot } = useDemo()
+  const [assignOpen, setAssignOpen] = React.useState(false)
+  const [selectedSlot, setSelectedSlot] = React.useState<string | undefined>(undefined)
 
   const handleSlotClick = (slotId: string) => {
-    setSelectedSlotId(slotId);
-    setView("schedule"); 
-  };
+    const slot = slots.find(s => s.id === slotId)
+    if (!slot) return
+    // if slot is reservation-enabled and has an assignedReservationId, do nothing (already reserved)
+    if (slot.isReservationSlot && slot.assignedReservationId) {
+      // already reserved by an online user
+      return
+    }
+    // open offline assign dialog for valet to fill
+    setSelectedSlot(slotId)
+    setAssignOpen(true)
+  }
 
   return (
    <div className="md:w-[60%] sm:w-full">
-      <h1 className="text-4xl font-bold py-2">Valet Parking</h1>
-      <select
-        className="border border-gray-300 p-2 rounded mb-6"
-        onChange={(e) => setView(e.target.value as "grid" | "schedule")}
-        value={view}
-      >
-        <option value="grid">Grid View</option>
-        <option value="valet">Schedule View</option>
-      </select>
-
-      {view === "grid" ? (
+      <Paper elevation={1} sx={{ p: 2, bgcolor: 'background.paper' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="h5" component="h1" fontWeight={700}>
+            Valet Parking
+          </Typography>
+        </Box>
         <Gridview slots={slots} onSlotClick={handleSlotClick}  />
-      ) : (
-        <Scheduleview selectedSlotId={selectedSlotId} />
-      )}
+  <AssignOfflineDialog open={assignOpen} onClose={() => setAssignOpen(false)} slotId={selectedSlot} />
+      </Paper>
     </div>
   );
 };

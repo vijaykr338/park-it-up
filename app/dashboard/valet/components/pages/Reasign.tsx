@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 const Reassign = () => {
   const [showpopup, setShowpopup] = useState(false);
-  const [view, setView] = useState(false);
+  
 
   return (
     <div>
@@ -26,7 +26,7 @@ const Reassign = () => {
             <button
               onClick={() => {
                 setShowpopup(false);
-                setView(false);
+               
               }}
               className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700 mt-6 hover:scale-110"
             >
