@@ -21,6 +21,17 @@ interface FormData {
   email: string;
 }
 
+interface ApiErrorResponse {
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+      email?: string[];
+      phone?: string[];
+    };
+  };
+}
+
 export function SignupForm({
   className,
   ...props
@@ -46,7 +57,7 @@ export function SignupForm({
       ...prevData,
       [name]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (error) {
       setError(null);
@@ -79,11 +90,11 @@ export function SignupForm({
       number: /\d/.test(password),
       special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)
     };
-    
+
     Object.values(checks).forEach(check => {
       if (check) strength++;
     });
-    
+
     return { strength, checks };
   }
 
@@ -198,7 +209,7 @@ export function SignupForm({
           }
         } catch (loginErr: unknown) {
           if (loginErr && typeof loginErr === 'object' && 'response' in loginErr) {
-            const loginResponse = (loginErr as any).response;
+            const loginResponse = (loginErr as ApiErrorResponse).response;
             setError(loginResponse?.data?.message || "Account created, but login failed. Please try logging in.");
           } else {
             setError("Account created, but login failed. Please try logging in.");
@@ -210,7 +221,7 @@ export function SignupForm({
     } catch (err: unknown) {
       console.error("Signup error:", err);
       if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as any).response;
+        const response = (err as ApiErrorResponse).response;
         if (response?.status === 400) {
           // Handle specific validation errors from backend
           const errorData = response.data;
@@ -225,7 +236,7 @@ export function SignupForm({
           }
         } else if (response?.status === 409) {
           setError("An account with this email or phone number already exists.");
-        } else if (response?.status >= 500) {
+        } else if (response?.status && response.status >= 500) {
           setError("Server error. Please try again later.");
         } else {
           setError(response?.data?.message || "An error occurred while creating account");
@@ -343,15 +354,14 @@ export function SignupForm({
                       {[1, 2, 3, 4, 5].map((level) => (
                         <div
                           key={level}
-                          className={`h-1 flex-1 rounded ${
-                            level <= passwordStrength.strength
+                          className={`h-1 flex-1 rounded ${level <= passwordStrength.strength
                               ? passwordStrength.strength <= 2
                                 ? 'bg-red-500'
                                 : passwordStrength.strength <= 3
-                                ? 'bg-yellow-500'
-                                : 'bg-green-500'
+                                  ? 'bg-yellow-500'
+                                  : 'bg-green-500'
                               : 'bg-gray-600'
-                          }`}
+                            }`}
                         />
                       ))}
                     </div>
