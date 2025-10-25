@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import PageLoader from '@/components/ui/PageLoader';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,7 +46,17 @@ export function SignupForm({
       ...prevData,
       [name]: value,
     }));
+    
+    // Clear error when user starts typing
+    if (error) {
+      setError(null);
+    }
   };
+
+  // Email validation function
+  function isValidEmail(email: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
 
   // Strong password validation function
   function isStrongPassword(password: string) {
@@ -55,11 +64,79 @@ export function SignupForm({
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(password);
   }
 
+  // Name validation function
+  function isValidName(name: string) {
+    return name.trim().length >= 2 && /^[a-zA-Z\s'-]+$/.test(name.trim());
+  }
+
+  // Password strength checker
+  function getPasswordStrength(password: string) {
+    let strength = 0;
+    const checks = {
+      length: password.length >= 8,
+      lowercase: /[a-z]/.test(password),
+      uppercase: /[A-Z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)
+    };
+    
+    Object.values(checks).forEach(check => {
+      if (check) strength++;
+    });
+    
+    return { strength, checks };
+  }
+
+  const passwordStrength = getPasswordStrength(formData.password);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
     const { firstName, lastName, email, phone, password, cnf_password } = formData;
+
+    // Comprehensive validation with specific error messages
+    if (!firstName.trim()) {
+      setError("First name is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!isValidName(firstName)) {
+      setError("First name must be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes");
+      setLoading(false);
+      return;
+    }
+
+    if (!lastName.trim()) {
+      setError("Last name is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!isValidName(lastName)) {
+      setError("Last name must be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes");
+      setLoading(false);
+      return;
+    }
+
+    if (!email.trim()) {
+      setError("Email is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address");
+      setLoading(false);
+      return;
+    }
+
+    if (!phone.trim()) {
+      setError("Phone number is required");
+      setLoading(false);
+      return;
+    }
 
     // Phone number validation
     const phoneDigits = phone.replace(/\D/g, '');
@@ -69,8 +146,9 @@ export function SignupForm({
       return;
     }
 
-    if (!firstName || !lastName || !email || !phone || !password || !cnf_password) {
-      setError("Please fill all fields");
+    if (!password) {
+      setError("Password is required");
+      setLoading(false);
       return;
     }
 
@@ -78,6 +156,13 @@ export function SignupForm({
       setError(
         "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
       );
+      setLoading(false);
+      return;
+    }
+
+    if (!cnf_password) {
+      setError("Please confirm your password");
+      setLoading(false);
       return;
     }
 
@@ -113,8 +198,8 @@ export function SignupForm({
           }
         } catch (loginErr: unknown) {
           if (loginErr && typeof loginErr === 'object' && 'response' in loginErr) {
-            // @ts-expect-error: loginErr.response may not be typed
-            setError(loginErr.response?.data?.message || "Account created, but login failed. Please try logging in.");
+            const loginResponse = (loginErr as any).response;
+            setError(loginResponse?.data?.message || "Account created, but login failed. Please try logging in.");
           } else {
             setError("Account created, but login failed. Please try logging in.");
           }
@@ -125,10 +210,28 @@ export function SignupForm({
     } catch (err: unknown) {
       console.error("Signup error:", err);
       if (err && typeof err === 'object' && 'response' in err) {
-        // @ts-expect-error: err.response may not be typed
-        setError(err.response?.data?.message || "An error occurred while creating account");
+        const response = (err as any).response;
+        if (response?.status === 400) {
+          // Handle specific validation errors from backend
+          const errorData = response.data;
+          if (errorData?.email) {
+            setError("This email is already registered. Please use a different email or try logging in.");
+          } else if (errorData?.phone) {
+            setError("This phone number is already registered. Please use a different number or try logging in.");
+          } else if (errorData?.message) {
+            setError(errorData.message);
+          } else {
+            setError("Please check your information and try again.");
+          }
+        } else if (response?.status === 409) {
+          setError("An account with this email or phone number already exists.");
+        } else if (response?.status >= 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setError(response?.data?.message || "An error occurred while creating account");
+        }
       } else {
-        setError("An error occurred while creating account");
+        setError("Network error. Please check your connection and try again.");
       }
     } finally {
       setLoading(false);
@@ -140,7 +243,6 @@ export function SignupForm({
       <Card className="overflow-hidden p-0 bg-[#0a121a]">
         <CardContent className="grid p-0 md:grid-cols-1">
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
-            <PageLoader open={loading} text="Creating account…" />
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold text-white">Welcome!</h1>
@@ -163,10 +265,11 @@ export function SignupForm({
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="Enter your email address"
                   required
                   value={formData.email}
                   onChange={handleChange}
+                  autoComplete="email"
                 />
               </div>
               <div className="grid gap-3 md:grid-cols-2 text-white">
@@ -176,9 +279,11 @@ export function SignupForm({
                     id="firstName"
                     name="firstName"
                     type="text"
+                    placeholder="Enter your first name"
                     required
                     value={formData.firstName}
                     onChange={handleChange}
+                    autoComplete="given-name"
                   />
                 </div>
                 <div className="flex flex-col gap-3">
@@ -187,9 +292,11 @@ export function SignupForm({
                     id="lastName"
                     name="lastName"
                     type="text"
+                    placeholder="Enter your last name"
                     required
                     value={formData.lastName}
                     onChange={handleChange}
+                    autoComplete="family-name"
                   />
                 </div>
               </div>
@@ -204,6 +311,7 @@ export function SignupForm({
                   value={formData.phone}
                   onChange={handleChange}
                   maxLength={10}
+                  autoComplete="tel"
                 />
               </div>
               <div className="grid gap-3 text-white">
@@ -213,9 +321,11 @@ export function SignupForm({
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
+                    placeholder="Create a strong password"
                     required
                     value={formData.password}
                     onChange={handleChange}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
@@ -227,6 +337,46 @@ export function SignupForm({
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                {formData.password && (
+                  <div className="mt-2">
+                    <div className="flex gap-1 mb-2">
+                      {[1, 2, 3, 4, 5].map((level) => (
+                        <div
+                          key={level}
+                          className={`h-1 flex-1 rounded ${
+                            level <= passwordStrength.strength
+                              ? passwordStrength.strength <= 2
+                                ? 'bg-red-500'
+                                : passwordStrength.strength <= 3
+                                ? 'bg-yellow-500'
+                                : 'bg-green-500'
+                              : 'bg-gray-600'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      Password must contain:
+                      <ul className="mt-1 space-y-1">
+                        <li className={passwordStrength.checks.length ? 'text-green-400' : 'text-gray-400'}>
+                          ✓ At least 8 characters
+                        </li>
+                        <li className={passwordStrength.checks.lowercase ? 'text-green-400' : 'text-gray-400'}>
+                          ✓ One lowercase letter
+                        </li>
+                        <li className={passwordStrength.checks.uppercase ? 'text-green-400' : 'text-gray-400'}>
+                          ✓ One uppercase letter
+                        </li>
+                        <li className={passwordStrength.checks.number ? 'text-green-400' : 'text-gray-400'}>
+                          ✓ One number
+                        </li>
+                        <li className={passwordStrength.checks.special ? 'text-green-400' : 'text-gray-400'}>
+                          ✓ One special character
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="grid gap-3 text-white">
                 <Label htmlFor="cnf_password">Confirm Password</Label>
@@ -235,9 +385,11 @@ export function SignupForm({
                     id="cnf_password"
                     name="cnf_password"
                     type={showCnfPassword ? "text" : "password"}
+                    placeholder="Confirm your password"
                     required
                     value={formData.cnf_password}
                     onChange={handleChange}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
@@ -260,7 +412,7 @@ export function SignupForm({
 
               {/* Social login and other UI parts untouched */}
               {/* ... */}
-            
+
 
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-[#141a24] text-white relative z-10 px-2">

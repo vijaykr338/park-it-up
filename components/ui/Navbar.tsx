@@ -28,11 +28,21 @@ const Navbar = () => {
         setShowProfileDropdown(false);
       }
     }
+
+    function handleEscapeKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setShowProfileDropdown(false);
+      }
+    }
+
     if (showProfileDropdown) {
       document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscapeKey);
     }
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [showProfileDropdown]);
 
@@ -57,13 +67,13 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { 
-      name: 'How it works', 
+    {
+      name: 'How it works',
       href: '/#how-it-works',
       onClick: () => handleSectionClick('how-it-works')
     },
-    { 
-      name: 'Features', 
+    {
+      name: 'Features',
       href: '/#features',
       onClick: () => handleSectionClick('features')
     },
@@ -73,7 +83,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-[#0a121a] w-full top-0 backdrop-blur-md z-50 relative">
+    <nav className="bg-[#0a121a] w-full top-0 backdrop-blur-md z-[100000] relative">
       <div className="max-w-7xl container mx-auto px-4 py-4">
         <div className="flex items-center justify-between object-contain h-9">
           {/* Logo */}
@@ -98,11 +108,10 @@ const Navbar = () => {
                   key={link.name}
                   href={link.href}
                   onClick={link.onClick}
-                  className={`${
-                    isActive
+                  className={`${isActive
                       ? "text-[#4d84a4] transition-colors"
                       : "text-gray-100 hover:text-[#4d84a4] transition-colors"
-                  }`}
+                    }`}
                 >
                   {link.name}
                 </Link>
@@ -115,7 +124,7 @@ const Navbar = () => {
             {isAuthenticated ? (
               <div className="relative" ref={dropdownRef}>
                 <button
-                  className="flex items-center focus:outline-none"
+                  className="flex items-center focus:outline-none hover:opacity-80 transition-opacity"
                   onClick={() => setShowProfileDropdown((v) => !v)}
                 >
                   <Avatar className="w-8 h-8 border border-[#4d84a4]">
@@ -126,25 +135,57 @@ const Navbar = () => {
                   </Avatar>
                 </button>
                 {showProfileDropdown && (
-                  <div className="absolute right-0 mt-2 w-40 bg-[#232834] rounded shadow-lg z-[9999] border border-[#4d84a4]">
-                    <button
-                      className="block w-full text-left px-4 py-2 text-white hover:bg-[#4d84a4] transition-colors"
-                      onClick={() => {
-                        setShowProfileDropdown(false);
-                        router.push("/profile");
-                      }}
-                    >
-                      Profile
-                    </button>
-                    <button
-                      className="block w-full text-left px-4 py-2 text-red-500 hover:bg-red-700 hover:text-white transition-colors"
-                      onClick={() => {
-                        setShowProfileDropdown(false);
-                        handleLogout();
-                      }}
-                    >
-                      Logout
-                    </button>
+                  <div
+                    className="absolute right-0 mt-2 w-48 bg-[#232834] rounded-lg shadow-xl z-[100001] border border-[#4d84a4] overflow-hidden"
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      marginTop: '8px',
+                      pointerEvents: 'auto',
+                      zIndex: 100001
+                    }}
+                  >
+                    <div className="py-1">
+                      <button
+                        className="block w-full text-left px-4 py-3 text-white hover:bg-[#4d84a4] transition-colors duration-200 cursor-pointer border-none bg-transparent"
+                        style={{ pointerEvents: 'auto' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#4d84a4';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShowProfileDropdown(false);
+                          router.push("/profile");
+                        }}
+                      >
+                        Profile
+                      </button>
+                      <button
+                        className="block w-full text-left px-4 py-3 text-red-400 hover:bg-red-600 hover:text-white transition-colors duration-200 cursor-pointer border-none bg-transparent"
+                        style={{ pointerEvents: 'auto' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#dc2626';
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = '#f87171';
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShowProfileDropdown(false);
+                          handleLogout();
+                        }}
+                      >
+                        Logout
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -190,11 +231,10 @@ const Navbar = () => {
                     key={link.name}
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block py-2 px-3 rounded-md text-base font-medium ${
-                      isActive
+                    className={`block py-2 px-3 rounded-md text-base font-medium ${isActive
                         ? "text-[#4d84a4] bg-gray-800"
                         : "text-gray-100 hover:text-[#4d84a4] hover:bg-gray-800"
-                    } transition-colors`}
+                      } transition-colors`}
                   >
                     {link.name}
                   </Link>
@@ -202,15 +242,25 @@ const Navbar = () => {
               })}
               <div className="pt-4 border-t border-gray-800 space-y-2">
                 {isAuthenticated ? (
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      handleLogout();
-                    }}
-                    className="block w-full text-center py-2 px-4 bg-red-500 text-white rounded-full hover:bg-red-700 transition-colors"
-                  >
-                    Logout
-                  </button>
+                  <>
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block w-full text-center py-2 px-4 bg-[#4d84a4] text-white rounded-full hover:bg-[#3a6b85] transition-colors"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="block w-full text-center py-2 px-4 bg-red-500 text-white rounded-full hover:bg-red-700 transition-colors cursor-pointer"
+                    >
+                      Logout
+                    </button>
+                  </>
                 ) : (
                   <>
                     <Link
