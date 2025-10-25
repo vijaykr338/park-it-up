@@ -16,6 +16,11 @@ export interface ParkingSpot {
   distanceKm?: number;
 }
 
+// Helper function to check if a parking spot is bookable (from backend)
+export const isBookableSpot = (parking: ParkingSpot): boolean => {
+  return parking.id.startsWith('django-');
+};
+
 export interface DjangoAPIResponse {
   id: number;
   name: string;

@@ -6,7 +6,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import Image from "next/image";
 import { useParkingData } from "./features/useParkingData";
-import { ParkingSpot } from "./features/types";
+import { ParkingSpot, isBookableSpot } from "./features/types";
 import { useQueryParams } from "./useQueryParams";
 import MapContainer from "./MapContainer";
 import { useAuthStore } from "@/lib/auth-store";
@@ -149,12 +149,25 @@ function EnhancedParkingDetail({
               <div className="text-sm text-[#94a3b8]">per hour</div>
             </div>
           </div>
-          <button
-            onClick={handleReserveClick}
-            className="w-full bg-[#3b82f6] hover:bg-[#2563eb] text-white py-4 rounded-xl font-bold text-base transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
-            Reserve This Spot
-          </button>
+          {/* Conditional Reserve Button - Only for Backend Spots */}
+          {isBookableSpot(parking) ? (
+            <button
+              onClick={handleReserveClick}
+              className="w-full bg-[#3b82f6] hover:bg-[#2563eb] text-white py-4 rounded-xl font-bold text-base transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              Reserve This Spot
+            </button>
+          ) : (
+            <div className="w-full bg-[#374151] text-[#94a3b8] py-4 rounded-xl font-bold text-base text-center">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <span>📍</span>
+                <span>Reference Only</span>
+              </div>
+              <div className="text-xs opacity-75">
+                Booking not available for this location
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -280,6 +293,12 @@ function EnhancedParkingList({
               <h3 className="font-bold text-[#e2e8f0] text-sm leading-tight truncate">
                 {location.name}
               </h3>
+              {/* Backend spot indicator */}
+              {isBookableSpot(location) && (
+                <span className="bg-[#60a5fa] text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium">
+                  BOOKABLE
+                </span>
+              )}
               {location.category && getCategoryBadge(location.category)}
             </div>
             <div className="text-xs text-[#94a3b8] truncate mb-1">{location.address}</div>

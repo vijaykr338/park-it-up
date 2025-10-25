@@ -121,15 +121,9 @@ class ParkingService {
   }
 
   private mergeAndDedupe(django: ParkingSpot[], google: ParkingSpot[]): ParkingSpot[] {
-    const merged = new Map<string, ParkingSpot>();
-    
-    // Add Google spots first
-    google.forEach(spot => merged.set(spot.id, spot));
-    
-    // Add Django spots (will override if same location, but with prefixed IDs this won't happen)
-    django.forEach(spot => merged.set(spot.id, spot));
-    
-    return Array.from(merged.values());
+    // Prioritize Django spots by putting them first in the array
+    // This ensures backend spots always appear at the top of the list
+    return [...django, ...google];
   }
 }
 

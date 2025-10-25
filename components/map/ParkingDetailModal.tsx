@@ -15,7 +15,7 @@ import {
   FaCcDiscover,
 } from "react-icons/fa";
 import { SiPaypal } from "react-icons/si";
-import { ParkingSpot } from "./features/types";
+import { ParkingSpot, isBookableSpot } from "./features/types";
 import Image from "next/image";
 import { useAuthStore } from "@/lib/auth-store";
 import AuthModal from "@/components/ui/AuthModal";
@@ -234,13 +234,25 @@ export default function ParkingDetailModal({
             </div>
           </div>
 
-          {/* Book Now Button */}
-          <button 
-            onClick={handleBookNow}
-            className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white font-semibold py-3 rounded-xl text-base transition-colors duration-200 mt-2"
-          >
-            Book Now - ${parking.pricePerHour}
-          </button>
+          {/* Conditional Book Now Button - Only for Backend Spots */}
+          {isBookableSpot(parking) ? (
+            <button 
+              onClick={handleBookNow}
+              className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white font-semibold py-3 rounded-xl text-base transition-colors duration-200 mt-2"
+            >
+              Book Now - ${parking.pricePerHour}
+            </button>
+          ) : (
+            <div className="w-full bg-[#374151] text-[#94a3b8] font-semibold py-3 rounded-xl text-base text-center mt-2">
+              <div className="flex items-center justify-center gap-2">
+                <span>📍</span>
+                <span>Reference Location Only</span>
+              </div>
+              <div className="text-xs mt-1 opacity-75">
+                This location is for reference. Booking not available.
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

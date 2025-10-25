@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Image from "next/image";
 import { FaStar, FaWalking} from 'react-icons/fa';
-import { ParkingSpot } from './features/types';
+import { ParkingSpot, isBookableSpot } from './features/types';
 import { useAuthStore } from "@/lib/auth-store";
 import AuthModal from "@/components/ui/AuthModal";
 
@@ -76,8 +76,17 @@ function ParkingCard({
       `}
       onClick={onClick}
     >
-      {/* Category Badge */}
-      {getCategoryBadge()}
+      {/* Badges */}
+      <div className="flex items-center gap-1 mb-1">
+        {/* Backend spot indicator */}
+        {isBookableSpot(parking) && (
+          <span className="bg-[#60a5fa] text-white text-[8px] px-1 py-0.5 rounded-full font-medium">
+            BOOKABLE
+          </span>
+        )}
+        {/* Category Badge */}
+        {getCategoryBadge()}
+      </div>
 
       {/* Parking Image */}
       <div className="mb-2">
@@ -120,13 +129,19 @@ function ParkingCard({
             <span className="text-xs text-[#9ca3af] font-normal">/hr</span>
           </div>
         </div>
-        {/* Book Now Button */}
-        <button
-          onClick={handleBookNow}
-          className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white font-medium py-1 px-2 rounded-lg transition-colors text-xs mt-1 text-center"
-        >
-          Book Now
-        </button>
+        {/* Conditional Book Now Button - Only for Backend Spots */}
+        {isBookableSpot(parking) ? (
+          <button
+            onClick={handleBookNow}
+            className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white font-medium py-1 px-2 rounded-lg transition-colors text-xs mt-1 text-center"
+          >
+            Book Now
+          </button>
+        ) : (
+          <div className="w-full bg-[#374151] text-[#94a3b8] font-medium py-1 px-2 rounded-lg text-xs mt-1 text-center cursor-not-allowed">
+            View Only
+          </div>
+        )}
       </div>
 
       {/* Authentication Modal */}
