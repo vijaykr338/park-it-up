@@ -35,7 +35,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: data?.error || data }, { status: resp.status });
     }
 
-    return NextResponse.json(data);
+    // Return the order ID in the expected format
+    return NextResponse.json({ 
+      orderId: data.id,
+      ...data 
+    });
   } catch (e: unknown) {
     let message = "Unknown error";
     if (e instanceof Error) message = e.message;

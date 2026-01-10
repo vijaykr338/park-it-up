@@ -121,6 +121,17 @@ const Navbar = () => {
 
           {/* Desktop auth / profile */}
           <div className="hidden md:flex items-center space-x-3">
+            {isAuthenticated && (
+              <Link href="/user-bookings">
+                <Button 
+                  variant="outline" 
+                  className="border-[#4d84a4] text-[#4d84a4] hover:bg-[#4d84a4] hover:text-white text-sm px-3 py-2"
+                >
+                  <span className="hidden lg:inline">My Bookings</span>
+                  <span className="lg:hidden">Bookings</span>
+                </Button>
+              </Link>
+            )}
             {isAuthenticated ? (
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -243,6 +254,13 @@ const Navbar = () => {
               <div className="pt-4 border-t border-gray-800 space-y-2">
                 {isAuthenticated ? (
                   <>
+                    <Link
+                      href="/user-bookings"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block w-full text-center py-2 px-4 bg-[#4d84a4] text-white rounded-full hover:bg-[#3a6b85] transition-colors"
+                    >
+                      My Bookings
+                    </Link>
                     <Link
                       href="/profile"
                       onClick={() => setIsMobileMenuOpen(false)}

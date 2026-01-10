@@ -25,20 +25,14 @@ export default function TimeSelectionDialog({
 
   // Generate available time slots
   const timeSlots = useMemo(() => {
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    
     const slots: Array<{ time: string; label: string; disabled: boolean }> = [];
-    
-    // Generate slots from 8 AM to 12 AM (midnight)
+
+    // Debug-friendly: keep original list, but allow selecting any slot (no past-time disabling).
+    // Generate slots from 8 AM to 11:30 PM.
     for (let hour = 8; hour <= 23; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const timeString = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
-        
-        // Check if this time slot is in the past
-        const isPast = hour < currentHour || (hour === currentHour && minute <= currentMinute);
-        
+
         // Format label
         const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
         const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -48,7 +42,7 @@ export default function TimeSelectionDialog({
         slots.push({
           time: timeString,
           label,
-          disabled: isPast
+          disabled: false,
         });
       }
     }
