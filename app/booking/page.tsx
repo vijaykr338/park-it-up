@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import TimeSelectionDialog from "@/components/booking/TimeSelectionDialog";
 import api from "@/lib/axios";
+import type { ParkingSlot } from "./booking-types";
 
 declare global {
   interface Window {
@@ -29,6 +30,8 @@ const BookingSummaryPage = () => {
   const params = useSearchParams();
   const router = useRouter();
   const locationId = params.get("location");
+  const selectedSpot = params.get("spot");
+  const selectedZone = params.get("zone");
 
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
@@ -39,6 +42,10 @@ const BookingSummaryPage = () => {
   const [timeDialogOpen, setTimeDialogOpen] = useState(false);
   const [startTime, setStartTime] = useState<string>(""); // ISO string
   const [startTimeDisplay, setStartTimeDisplay] = useState<string>(""); // HH:MM
+
+  const [slotDetails, setSlotDetails] = useState<ParkingSlot | null>(null);
+  const [slotLoading, setSlotLoading] = useState(false);
+  const [slotError, setSlotError] = useState<string | null>(null);
 
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
@@ -102,6 +109,48 @@ const BookingSummaryPage = () => {
     };
   }, [locationId]);
 
+  useEffect(() => {
+    let mounted = true;
+
+    if (!selectedZone || !selectedSpot) {
+      setSlotDetails(null);
+      setSlotError(null);
+      setSlotLoading(false);
+      return () => {
+        mounted = false;
+      };
+    }
+
+    setSlotLoading(true);
+    setSlotError(null);
+
+    api
+      .get(`/parking/zones/${selectedZone}/slots/`)
+      .then((res) => {
+        if (!mounted) return;
+        const slot = Array.isArray(res.data?.slots)
+          ? res.data.slots.find((s: ParkingSlot) => String(s.id) === String(selectedSpot))
+          : null;
+        setSlotDetails(slot ?? null);
+        if (!slot) {
+          setSlotError("Selected slot not found. Please pick a slot again.");
+        }
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        console.error(err);
+        setSlotError("Unable to load slot details. Please retry or pick another slot.");
+      })
+      .finally(() => {
+        if (!mounted) return;
+        setSlotLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [selectedZone, selectedSpot]);
+
   const handleTimeChange = (isoTime: string) => {
     const dt = new Date(isoTime);
     if (!isNaN(dt.getTime())) {
@@ -130,6 +179,10 @@ const BookingSummaryPage = () => {
       hasError = true;
       // focus the vehicle select so user notices
       vehicleSelectRef.current?.focus();
+    }
+    if (!selectedZone || !selectedSpot) {
+      setLastSaved("Please select a zone and slot.");
+      hasError = true;
     }
     if (!startTime) {
       setShowTimeError(true);
@@ -186,6 +239,8 @@ const BookingSummaryPage = () => {
               const bookingRes = await api.post("/booking/create/", {
                 vehicle_id: selectedVehicleId,
                 location_id: Number(locationId),
+                slot_id: selectedSpot ? Number(selectedSpot) : undefined,
+                zone_id: selectedZone ? Number(selectedZone) : undefined,
                 start_time: startTime,
               });
 
@@ -234,7 +289,7 @@ const BookingSummaryPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#01030a] via-[#0a0f1c] to-[#0a121a] text-white">
-      <PageLoader open={vehiclesLoading || locationLoading || isSaving} text={isSaving ? 'Processing payment…' : 'Loading...'} />
+      <PageLoader open={vehiclesLoading || locationLoading || slotLoading || isSaving} text={isSaving ? 'Processing payment…' : 'Loading...'} />
       
       <div className="relative isolate overflow-hidden">
         {/* Gradient accents */}
@@ -269,8 +324,24 @@ const BookingSummaryPage = () => {
             {/* Spot Card */}
             <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-[#0c111a] to-[#101427] p-4 backdrop-blur">
               <div className="text-xs uppercase tracking-widest text-gray-400 mb-1">Parking Spot</div>
-              <div className="text-lg font-semibold">Auto-assigned</div>
-              <p className="text-xs text-gray-400 mt-1">Assigned after booking</p>
+              <div className="text-lg font-semibold">
+                {slotDetails ? (
+                  <span>
+                    Zone {slotDetails.zone_name || selectedZone} · #{slotDetails.number}
+                  </span>
+                ) : (
+                  <span>Select a slot</span>
+                )}
+              </div>
+              <p className="text-xs text-gray-400 mt-1">
+                {slotDetails ? "Locked in for this booking" : "Pick a zone and slot first"}
+              </p>
+              <button
+                onClick={() => router.push(`/booking/select-zone?location=${locationId}`)}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-sky-200 hover:border-white/20"
+              >
+                Change selection
+              </button>
             </div>
 
             {/* Time Card */}
@@ -303,6 +374,29 @@ const BookingSummaryPage = () => {
                     <div className="text-xs uppercase tracking-widest text-gray-400 mb-2">Location</div>
                     <p className="text-base font-semibold">{locationDetails?.name || "Loading..."}</p>
                     <p className="text-sm text-gray-400 mt-1">{locationDetails?.address || ""}</p>
+                  </div>
+
+                  <div className="rounded-lg bg-[#0a0f1c] p-4 border border-white/5 flex items-start justify-between gap-4">
+                    <div>
+                      <div className="text-xs uppercase tracking-widest text-gray-400 mb-2">Selected Slot</div>
+                      {slotDetails ? (
+                        <>
+                          <p className="text-base font-semibold">Zone {slotDetails.zone_name || selectedZone}</p>
+                          <p className="text-sm text-gray-300">Slot #{slotDetails.number}</p>
+                        </>
+                      ) : (
+                        <p className="text-sm text-red-300">No slot selected.</p>
+                      )}
+                      {slotError && (
+                        <p className="text-sm text-red-400 mt-2">{slotError}</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => router.push(`/booking/select-zone?location=${locationId}`)}
+                      className="rounded-lg border border-[#4d84a4]/40 bg-[#4d84a4]/10 px-3 py-2 text-sm font-semibold text-[#a6c8dd] hover:bg-[#4d84a4]/20 transition"
+                    >
+                      Change
+                    </button>
                   </div>
 
                   <div className="rounded-lg bg-[#0a0f1c] p-4 border border-white/5 flex items-center justify-between">

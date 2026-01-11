@@ -74,8 +74,8 @@ export default function ParkingDetailModal({
       setShowAuthModal(true);
       return;
     }
-    // If authenticated, proceed to booking (slot/zone are auto-assigned by backend)
-    window.location.href = `/booking?location=${String(parking.id).replace(/^django-/, "")}`;
+    // Redirect to zone + slot selection before booking
+    window.location.href = `/booking/select-zone?location=${String(parking.id).replace(/^django-/, "")}`;
   };
 
   return (
