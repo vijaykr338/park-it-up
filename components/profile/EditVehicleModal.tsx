@@ -136,8 +136,10 @@ export default function EditVehicleModal({
                 {images.length === 0 && (
                   <p className="text-gray-400 text-sm">No images uploaded.</p>
                 )}
-                {images.map((img) => (
-                  <div key={img.id} className="relative">
+                {images.map((img, idx) => {
+                  const key = img.id ?? `${img.picture_link}-${idx}`;
+                  return (
+                    <div key={key} className="relative">
                     <Image
                       src={img.picture_link}
                       alt="vehicle"
@@ -152,8 +154,9 @@ export default function EditVehicleModal({
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

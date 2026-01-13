@@ -1,25 +1,3 @@
-// import { create } from 'zustand';
-
-// interface AuthState {
-//   isAuthenticated: boolean;
-//   login: (token: string, refreshToken: string) => void;
-//   logout: () => void;
-// }
-
-// export const useAuthStore = create<AuthState>((set) => ({
-//   isAuthenticated: typeof window !== 'undefined' && !!localStorage.getItem('accessToken'),
-//   login: (token, refreshToken) => {
-//     localStorage.setItem('accessToken', token);
-//     localStorage.setItem('refreshToken', refreshToken);
-//     set({ isAuthenticated: true });
-//   },
-//   logout: () => {
-//     localStorage.removeItem('accessToken');
-//     localStorage.removeItem('refreshToken');
-//     set({ isAuthenticated: false });
-//   },
-// })); 
-
 "use client";
 
 import { create } from "zustand";
@@ -46,17 +24,15 @@ export const useAuthStore = create<AuthState>()(
       access: null,
       refresh: null,
       isRefreshing: false,
-
       login: (access, refresh) => set({ access, refresh }),
       setTokens: ({ access, refresh }) => set({ access, refresh }),
       logout: () => set({ access: null, refresh: null }),
-
       getAccess: () => get().access,
       getRefresh: () => get().refresh,
-      markRefreshing: (v: boolean) => set({ isRefreshing: v }),
+      markRefreshing: (v) => set({ isRefreshing: v }),
     }),
     {
-      name: "auth", // localStorage key
+      name: "auth",
       partialize: (s) => ({ access: s.access, refresh: s.refresh }),
     }
   )

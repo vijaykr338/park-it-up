@@ -3,9 +3,7 @@
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { useQuery } from "@tanstack/react-query";
-import api from "@/lib/axios";
-import { BookingAPIResponse } from "@/components/reservation/types/reservation";
+import { useBookingDetails } from "@/components/reservation/hooks/useBookingDetails";
 
 // ✅ Local type definitions (no global Window extension)
 type RazorpayOptions = {
@@ -72,30 +70,14 @@ export default function ReceiptPage() {
   const [paying, setPaying] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
-  // Fetch booking details from API
-  const { data: booking, isLoading, error } = useQuery<BookingAPIResponse>({
-    queryKey: ['booking-details', bookingId],
-    queryFn: async (): Promise<BookingAPIResponse> => {
-      if (!bookingId) {
-        throw new Error('No booking ID provided');
-      }
-      
-      try {
-        const response = await api.get(`/booking/my-bookings/${bookingId}/`);
-        return response.data;
-      } catch (error: unknown) {
-        const axiosError = error as { response?: { status?: number } };
-        if (axiosError.response?.status === 404) {
-          throw new Error('Booking not found');
-        } else if (axiosError.response?.status === 403) {
-          throw new Error('Unauthorized access to booking');
-        }
-        throw new Error('Failed to fetch booking details');
-      }
-    },
-    enabled: !!bookingId,
-    retry: 1,
-  });
+  const { booking, isLoading, error } = useBookingDetails(bookingId);
+
+  // Mark this booking as awaiting payment in localStorage
+  React.useEffect(() => {
+    if (bookingId && booking?.exit_time) {
+      localStorage.setItem('unpaidBookingId', bookingId);
+    }
+  }, [bookingId, booking]);
 
   // Redirect to bookings page if no booking ID or error
   React.useEffect(() => {
@@ -172,7 +154,8 @@ export default function ReceiptPage() {
             const verifyData = await verifyResp.json();
 
             if (verifyData.success) {
-              // Payment verified successfully, redirect to feedback
+              // Payment verified successfully, clear unpaid status and redirect to feedback
+              localStorage.removeItem('unpaidBookingId');
               router.push(
                 `/feedback?ref=${encodeURIComponent(booking?.id?.toString() || bookingId || "")}&spot=${encodeURIComponent(booking?.slot_number?.toString() || "")}`
               );

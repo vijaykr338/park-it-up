@@ -11,8 +11,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Check, MapPin, Sparkles } from "lucide-react";
 import PageLoader from "@/components/ui/PageLoader";
+import api from "@/lib/axios";
 import { useParkingLocation, useParkingZones, useZoneSlots, extractErrorMessage } from "../hooks/booking-hooks";
-import type { ParkingSlot, Zone } from "../booking-types";
+import type { ParkingSlot, SlotsListResponse, Zone } from "../booking-types";
 
 const SelectZonePage: React.FC = () => {
   const params = useSearchParams();
@@ -21,6 +22,12 @@ const SelectZonePage: React.FC = () => {
 
   const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
+  const [zoneCounts, setZoneCounts] = useState<Record<number, {
+    total_slots: number;
+    available_slots: number;
+    reserved_slots: number;
+    occupied_slots: number;
+  }>>({});
 
   const {
     data: location,
@@ -57,8 +64,69 @@ const SelectZonePage: React.FC = () => {
     setSelectedSlot(null);
   }, [selectedZone?.id]);
 
+  useEffect(() => {
+    if (!zonesData?.zones?.length) return;
+
+    const missingZoneIds = zonesData.zones
+      .map((zone) => zone.id)
+      .filter((id) => zoneCounts[id] === undefined);
+
+    if (!missingZoneIds.length) return;
+
+    const controller = new AbortController();
+
+    const fetchCounts = async () => {
+      try {
+        const results = await Promise.all(
+          missingZoneIds.map(async (id) => {
+            const response = await api.get<SlotsListResponse>(`/parking/zones/${id}/slots/`, {
+              signal: controller.signal,
+            });
+            const { total_slots, available_slots, reserved_slots, occupied_slots } = response.data;
+            return [id, { total_slots, available_slots, reserved_slots, occupied_slots }] as const;
+          })
+        );
+
+        setZoneCounts((prev) => ({ ...prev, ...Object.fromEntries(results) }));
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error("Failed to load zone counts", error);
+        }
+      }
+    };
+
+    void fetchCounts();
+
+    return () => controller.abort();
+  }, [zonesData, zoneCounts]);
+
+  useEffect(() => {
+    if (!selectedZone?.id || !slotsData) return;
+    setZoneCounts((prev) => ({
+      ...prev,
+      [selectedZone.id]: {
+        total_slots: slotsData.total_slots,
+        available_slots: slotsData.available_slots,
+        reserved_slots: slotsData.reserved_slots,
+        occupied_slots: slotsData.occupied_slots,
+      },
+    }));
+  }, [selectedZone?.id, slotsData]);
+
   const slots = useMemo(() => slotsData?.slots ?? [], [slotsData]);
-  const freeSlots = useMemo(() => slots.filter((s) => s.status === "free"), [slots]);
+  const freeSlotsCount = useMemo(() => slots.filter((s) => s.status === "free").length, [slots]);
+  const slotStatusLabel = (status: string) => {
+    switch (status) {
+      case "free":
+        return "Available";
+      case "reserved":
+        return "Reserved";
+      case "occupied":
+        return "Occupied";
+      default:
+        return status;
+    }
+  };
 
   const handleContinue = () => {
     if (!locationId || !selectedZone || !selectedSlot) return;
@@ -162,6 +230,20 @@ const SelectZonePage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                   {(zonesData?.zones ?? []).map((zone) => {
                     const isActive = selectedZone?.id === zone.id;
+                    const activeSlotCounts = isActive && slotsData
+                      ? {
+                          total_slots: slotsData.total_slots,
+                          available_slots: slotsData.available_slots,
+                          reserved_slots: slotsData.reserved_slots,
+                          occupied_slots: slotsData.occupied_slots,
+                        }
+                      : null;
+                    const counts = zoneCounts[zone.id] ?? activeSlotCounts ?? {
+                      total_slots: zone.total_slots,
+                      available_slots: zone.available_slots,
+                      reserved_slots: zone.reserved_slots,
+                      occupied_slots: zone.occupied_slots,
+                    };
                     return (
                       <button
                         key={zone.id}
@@ -189,19 +271,19 @@ const SelectZonePage: React.FC = () => {
                         <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                           <div className="rounded-lg bg-white/5 px-3 py-2">
                             <p className="text-gray-400">Total</p>
-                            <p className="font-semibold text-white">{zone.total_slots}</p>
+                            <p className="font-semibold text-white">{counts.total_slots}</p>
                           </div>
                           <div className="rounded-lg bg-green-500/10 px-3 py-2 border border-green-500/20">
                             <p className="text-green-200/80">Free</p>
-                            <p className="font-semibold text-green-100">{zone.available_slots}</p>
+                            <p className="font-semibold text-green-100">{counts.available_slots}</p>
                           </div>
                           <div className="rounded-lg bg-amber-500/10 px-3 py-2 border border-amber-500/20">
                             <p className="text-amber-200/80">Reserved</p>
-                            <p className="font-semibold text-amber-100">{zone.reserved_slots}</p>
+                            <p className="font-semibold text-amber-100">{counts.reserved_slots}</p>
                           </div>
                           <div className="rounded-lg bg-red-500/10 px-3 py-2 border border-red-500/20">
                             <p className="text-red-200/80">Occupied</p>
-                            <p className="font-semibold text-red-100">{zone.occupied_slots}</p>
+                            <p className="font-semibold text-red-100">{counts.occupied_slots}</p>
                           </div>
                         </div>
                       </button>
@@ -214,35 +296,43 @@ const SelectZonePage: React.FC = () => {
               <div className="rounded-3xl border border-white/5 bg-gradient-to-br from-[#0c111a] to-[#0f1624] p-6 shadow-[0_15px_60px_rgba(5,8,20,0.8)]">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h2 className="text-lg font-semibold">Available Slots</h2>
-                    <p className="text-sm text-gray-400">Pick a free slot in the selected zone.</p>
+                    <h2 className="text-lg font-semibold">Slots</h2>
+                    <p className="text-sm text-gray-400">Pick a slot in the selected zone. Occupied slots are visible but not selectable.</p>
                   </div>
-                  <span className="text-sm text-gray-400">{freeSlots.length} free</span>
+                  <span className="text-sm text-gray-400">{freeSlotsCount} free</span>
                 </div>
 
                 {!selectedZone ? (
                   <div className="rounded-2xl border border-white/10 bg-[#0b1220]/60 p-6 text-center text-gray-400">
                     Select a zone to view its slots.
                   </div>
-                ) : freeSlots.length === 0 ? (
+                ) : slots.length === 0 ? (
                   <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-center text-amber-100">
-                    No free slots in this zone. Try another zone.
+                    No slots are registered in this zone yet.
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    {freeSlots.map((slot) => {
+                    {slots.map((slot) => {
                       const isActive = selectedSlot?.id === slot.id;
+                      const isDisabled = slot.status !== "free";
+                      const statusColor = isDisabled
+                        ? slot.status === "occupied"
+                          ? "text-red-300"
+                          : "text-amber-200"
+                        : "text-green-200";
                       return (
                         <button
                           key={slot.id}
-                          onClick={() => setSelectedSlot(slot)}
-                          className={`rounded-xl border px-4 py-3 text-left transition ${isActive
+                          onClick={() => !isDisabled && setSelectedSlot(slot)}
+                          disabled={isDisabled}
+                          className={`rounded-xl border px-4 py-3 text-left transition focus:outline-none ${isActive
                             ? "border-sky-500/60 bg-sky-500/15 shadow-[0_10px_30px_rgba(45,212,191,0.15)]"
-                            : "border-white/10 bg-[#0b1320]/80 hover:border-white/20 hover:-translate-y-0.5"}`}
+                            : "border-white/10 bg-[#0b1320]/80 hover:border-white/20"
+                          } ${isDisabled ? "cursor-not-allowed opacity-70" : "hover:-translate-y-0.5"}`}
                         >
                           <p className="text-xs uppercase tracking-widest text-gray-400">Slot</p>
                           <p className="text-lg font-semibold">#{slot.number}</p>
-                          <p className="text-xs text-green-200 mt-1">Available</p>
+                          <p className={`text-xs mt-1 ${statusColor}`}>{slotStatusLabel(slot.status)}</p>
                         </button>
                       );
                     })}

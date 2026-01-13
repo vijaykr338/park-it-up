@@ -10,13 +10,26 @@ import type { BookingStatus, BookingAPIResponse } from '@/components/reservation
 const UserBookingsPage = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
+  const [unpaidBookingId, setUnpaidBookingId] = useState<string | null>(null);
   
   const { activeBooking, isLoading: activeLoading, error: activeError, refetch: refetchActive } = useActiveBooking();
   const { bookings, isLoading: historyLoading, error: historyError, refetch: refetchHistory } = useAllBookings();
 
+  // Check for unpaid booking on mount and when tab changes
+  React.useEffect(() => {
+    const stored = localStorage.getItem('unpaidBookingId');
+    setUnpaidBookingId(stored);
+  }, [activeTab]);
+
   // Filter and sort completed bookings (those with exit_time) - most recent first
+  // But exclude the unpaid booking if it exists
   const completedBookings = bookings
-    .filter(booking => booking.exit_time)
+    .filter(booking => {
+      if (!booking.exit_time) return false;
+      // If this is the unpaid booking, don't show in history
+      if (unpaidBookingId && booking.id.toString() === unpaidBookingId) return false;
+      return true;
+    })
     .sort((a, b) => new Date(b.exit_time!).getTime() - new Date(a.exit_time!).getTime());
   
   const isLoading = activeTab === 'active' ? activeLoading : historyLoading;
@@ -33,6 +46,10 @@ const UserBookingsPage = () => {
   // Determine booking status
   const getBookingStatus = (): BookingStatus => {
     if (!activeBooking) return 'reserved';
+    // If this booking is awaiting payment (has exit_time and is unpaid)
+    if (activeBooking.exit_time && unpaidBookingId && activeBooking.id.toString() === unpaidBookingId) {
+      return 'checkout';
+    }
     return activeBooking.exit_time 
       ? 'checkout' 
       : activeBooking.start_time 
@@ -196,6 +213,7 @@ const UserBookingsPage = () => {
                 getStatusColor={getStatusColor}
                 getStatusText={getStatusText}
                 formatDateTime={formatDateTime}
+                isPendingPayment={activeBooking.exit_time !== null && unpaidBookingId === activeBooking.id.toString()}
               />
             )}
 
@@ -267,6 +285,7 @@ interface ActiveBookingCardProps {
   getStatusColor: (status: BookingStatus) => string;
   getStatusText: (status: BookingStatus) => string;
   formatDateTime: (dateString: string) => string;
+  isPendingPayment?: boolean;
 }
 
 function ActiveBookingCard({ 
@@ -275,10 +294,25 @@ function ActiveBookingCard({
   getBookingStatus, 
   getStatusColor, 
   getStatusText, 
-  formatDateTime 
+  formatDateTime,
+  isPendingPayment = false
 }: ActiveBookingCardProps) {
+  const router = useRouter();
+  
   return (
     <div className="rounded-xl border border-[#4d84a4]/25 bg-[#232834]/50 p-6">
+      {isPendingPayment && (
+        <div className="mb-4 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3">
+          <div className="flex items-center space-x-2">
+            <AlertCircle className="h-5 w-5 text-yellow-400 flex-shrink-0" />
+            <div>
+              <p className="text-yellow-400 font-medium text-sm">Payment Pending</p>
+              <p className="text-yellow-300/80 text-xs mt-0.5">Complete your payment to finalize this booking</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold">Active Booking</h2>
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(getBookingStatus())}`}>
@@ -327,12 +361,21 @@ function ActiveBookingCard({
 
         {/* Action Button */}
         <div className="pt-4 border-t border-[#4d84a4]/20">
-          <button 
-            onClick={onViewReservation}
-            className="w-full rounded-lg bg-[#4d84a4] px-4 py-3 font-semibold hover:brightness-110 transition-all text-white"
-          >
-            View Reservation Details
-          </button>
+          {isPendingPayment ? (
+            <button 
+              onClick={() => router.push(`/reservation/receipt?booking=${booking.id}`)}
+              className="w-full rounded-lg bg-yellow-500 px-4 py-3 font-semibold hover:brightness-110 transition-all text-black"
+            >
+              Complete Payment • ₹{booking.fare}
+            </button>
+          ) : (
+            <button 
+              onClick={onViewReservation}
+              className="w-full rounded-lg bg-[#4d84a4] px-4 py-3 font-semibold hover:brightness-110 transition-all text-white"
+            >
+              View Reservation Details
+            </button>
+          )}
         </div>
       </div>
     </div>

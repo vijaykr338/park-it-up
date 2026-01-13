@@ -4,7 +4,8 @@ import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import TimeSelectionDialog from "@/components/booking/TimeSelectionDialog";
 import api from "@/lib/axios";
-import type { ParkingSlot } from "./booking-types";
+import { useParkingLocation, useZoneSlots } from "@/app/booking/hooks/booking-hooks";
+import { useCreateBooking, extractBookingError } from "@/lib/hooks/booking.hooks";
 
 declare global {
   interface Window {
@@ -33,19 +34,51 @@ const BookingSummaryPage = () => {
   const selectedSpot = params.get("spot");
   const selectedZone = params.get("zone");
 
+  const locationParam = locationId ?? null;
+  const zoneParam = selectedZone ?? null;
+  const locationIdNumber = locationId ? Number(locationId) : undefined;
+
+  const selectedZoneId = selectedZone ? Number(selectedZone) : undefined;
+  const selectedSpotId = selectedSpot ? Number(selectedSpot) : undefined;
+
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [vehiclesLoading, setVehiclesLoading] = useState(true);
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(null);
-  const [locationDetails, setLocationDetails] = useState<LocationDetails | null>(null);
-  const [locationLoading, setLocationLoading] = useState(false);
+  const locationQuery = useParkingLocation(locationParam);
+  const zoneSlotsQuery = useZoneSlots(zoneParam);
+  const createBookingMutation = useCreateBooking();
 
   const [timeDialogOpen, setTimeDialogOpen] = useState(false);
   const [startTime, setStartTime] = useState<string>(""); // ISO string
   const [startTimeDisplay, setStartTimeDisplay] = useState<string>(""); // HH:MM
 
-  const [slotDetails, setSlotDetails] = useState<ParkingSlot | null>(null);
-  const [slotLoading, setSlotLoading] = useState(false);
-  const [slotError, setSlotError] = useState<string | null>(null);
+  const locationDetails = useMemo<LocationDetails | null>(() => {
+    if (!locationQuery.data) return null;
+    return {
+      name: locationQuery.data.name,
+      address: locationQuery.data.address,
+      price_per_hour: Number(locationQuery.data.hourly_rate ?? 0),
+    };
+  }, [locationQuery.data]);
+
+  const slotDetails = useMemo(() => {
+    if (!zoneSlotsQuery.data?.slots || selectedSpotId === undefined) return null;
+    return zoneSlotsQuery.data.slots.find((s) => s.id === selectedSpotId) ?? null;
+  }, [zoneSlotsQuery.data?.slots, selectedSpotId]);
+
+  const slotError = useMemo(() => {
+    if (!selectedZoneId || !selectedSpotId) return null;
+    if (zoneSlotsQuery.error) {
+      return "Unable to load slot details. Please retry or pick another zone.";
+    }
+    if (zoneSlotsQuery.isSuccess && !slotDetails) {
+      return "Selected slot not found. Please pick a slot again.";
+    }
+    return null;
+  }, [selectedZoneId, selectedSpotId, slotDetails, zoneSlotsQuery.error, zoneSlotsQuery.isSuccess]);
+
+  const slotLoading = zoneSlotsQuery.isFetching;
+  const locationLoading = locationQuery.isFetching;
 
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
@@ -85,76 +118,11 @@ const BookingSummaryPage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    let mounted = true;
-    if (locationId) {
-      setLocationLoading(true);
-      api
-        .get(`/parking/${locationId}/`)
-        .then((res) => {
-          if (!mounted) return;
-          setLocationDetails(res.data);
-        })
-        .catch((err) => console.error(err))
-        .finally(() => {
-          if (!mounted) return;
-          setLocationLoading(false);
-        });
-    } else {
-      setLocationDetails(null);
-    }
-
-    return () => {
-      mounted = false;
-    };
-  }, [locationId]);
-
-  useEffect(() => {
-    let mounted = true;
-
-    if (!selectedZone || !selectedSpot) {
-      setSlotDetails(null);
-      setSlotError(null);
-      setSlotLoading(false);
-      return () => {
-        mounted = false;
-      };
-    }
-
-    setSlotLoading(true);
-    setSlotError(null);
-
-    api
-      .get(`/parking/zones/${selectedZone}/slots/`)
-      .then((res) => {
-        if (!mounted) return;
-        const slot = Array.isArray(res.data?.slots)
-          ? res.data.slots.find((s: ParkingSlot) => String(s.id) === String(selectedSpot))
-          : null;
-        setSlotDetails(slot ?? null);
-        if (!slot) {
-          setSlotError("Selected slot not found. Please pick a slot again.");
-        }
-      })
-      .catch((err) => {
-        if (!mounted) return;
-        console.error(err);
-        setSlotError("Unable to load slot details. Please retry or pick another slot.");
-      })
-      .finally(() => {
-        if (!mounted) return;
-        setSlotLoading(false);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [selectedZone, selectedSpot]);
-
   const handleTimeChange = (isoTime: string) => {
     const dt = new Date(isoTime);
     if (!isNaN(dt.getTime())) {
-      setStartTime(isoTime);
+      // Always store as UTC ISO string: YYYY-MM-DDTHH:mm:ssZ
+      setStartTime(dt.toISOString());
       setStartTimeDisplay(
         `${dt.getHours().toString().padStart(2, "0")}:${dt
           .getMinutes()
@@ -236,19 +204,17 @@ const BookingSummaryPage = () => {
               }
 
               // 3. Only after successful payment, call booking API
-              const bookingRes = await api.post("/booking/create/", {
-                vehicle_id: selectedVehicleId,
-                location_id: Number(locationId),
-                slot_id: selectedSpot ? Number(selectedSpot) : undefined,
-                zone_id: selectedZone ? Number(selectedZone) : undefined,
-                start_time: startTime,
+              const booking = await createBookingMutation.mutateAsync({
+                vehicle_id: selectedVehicleId!,
+                location_id: locationIdNumber!,
+                slot_id: selectedSpotId!,
+                start_time: new Date(startTime).toISOString(),
               });
 
-            // 4. Redirect user to reservation page with booking id
-            const bookingId = bookingRes.data.id;
-            router.push(`/reservation?booking=${bookingId}`);
+              // 4. Redirect user to reservation page with booking id
+              router.push(`/reservation?booking=${booking.id}`);
           } catch (err) {
-            setLastSaved("Booking failed. Try again.");
+            setLastSaved(extractBookingError(err, "Booking failed. Try again."));
             console.error(err);
           } finally {
             setIsSaving(false);

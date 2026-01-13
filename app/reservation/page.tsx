@@ -324,7 +324,7 @@ export default function ReservationManagerPage() {
                 <div className="flex justify-between">
                   <span>Time Parked</span>
                   <span className="font-semibold">
-                    {status === "checked_in" || status === "checkout" ? formattedDuration : "Not started"}
+                    {status === "checked_in" || status === "checkout" ? formattedDuration : "Not Started"}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -335,12 +335,12 @@ export default function ReservationManagerPage() {
                 </div>
                 <div className="flex justify-between">
                   <span>Hourly Rate</span>
-                  <span>₹{hourlyRate} per hour</span>
+                  <span>₹{hourlyRate} Per Hour</span>
                 </div>
                 {status === "checked_in" && (
                   <div className="pt-2 border-t border-[#4d84a4]/20">
                     <div className="text-xs text-gray-400">
-                      Cost updates every minute • Timer runs live
+                      Cost Updates Every Minute • Timer Runs Live
                     </div>
                   </div>
                 )}

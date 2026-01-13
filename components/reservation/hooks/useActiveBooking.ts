@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import api from '@/lib/axios';
 import type { BookingAPIResponse, ReservationError } from '@/components/reservation/types/reservation';
 
@@ -24,24 +25,28 @@ export function useActiveBooking(): UseActiveBookingReturn {
         const response = await api.get('/booking/my-active-booking/');
         return response.data;
       } catch (error: unknown) {
-        const axiosError = error as { response?: { status?: number }; message?: string };
-        // If no active booking found (404), return null instead of throwing
-        if (axiosError.response?.status === 404) {
-          return null;
+        if (error instanceof AxiosError) {
+          if (error.response?.status === 404) return null;
+          const errorObj: ReservationError = {
+            message: error.message || 'Failed to fetch active booking',
+            code: 'NETWORK_ERROR',
+            statusCode: error.response?.status
+          };
+          throw errorObj;
         }
-        
-        // For other errors, throw them
-        const errorObj: ReservationError = {
-          message: axiosError.message || 'Failed to fetch active booking',
+
+        const fallbackError: ReservationError = {
+          message: (error as Error).message || 'Failed to fetch active booking',
           code: 'NETWORK_ERROR',
-          statusCode: axiosError.response?.status
+          statusCode: undefined
         };
-        throw errorObj;
+        throw fallbackError;
       }
     },
     refetchInterval: 7000, // Poll every 7 seconds
     refetchIntervalInBackground: false, // Pause when tab is not active
     refetchOnWindowFocus: true,
+    staleTime: 5000, // Consider data fresh for 5 seconds
     retry: (failureCount, error: unknown) => {
       const err = error as ReservationError;
       // Don't retry on 404 (no active booking)
@@ -52,6 +57,10 @@ export function useActiveBooking(): UseActiveBookingReturn {
       return failureCount < 3;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    meta: {
+      // Suppress error logging for 404s in dev tools
+      errorBoundary: false,
+    }
   });
 
   const error: ReservationError | null = queryError ? {

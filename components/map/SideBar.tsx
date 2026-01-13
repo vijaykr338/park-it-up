@@ -13,6 +13,37 @@ import { useAuthStore } from "@/lib/auth-store";
 import AuthModal from "@/components/ui/AuthModal";
 import "./sidebar-scroll.css";
 
+const CATEGORY_BADGES: Record<string, { label: string; color: string }> = {
+  "best-value": { label: "Best Value", color: "bg-green-600" },
+  "shortest-walk": { label: "Shortest Walk", color: "bg-orange-600" },
+  "highest-rated": { label: "Highest Rated", color: "bg-purple-600" }
+};
+
+const formatPlaceName = (value?: string | null) => {
+  if (!value) return "";
+  return value
+    .split(/\s+/)
+    .map((segment) => {
+      if (!segment) return "";
+      return `${segment.charAt(0).toUpperCase()}${segment.slice(1)}`;
+    })
+    .join(" ")
+    .trim();
+};
+
+const renderCategoryBadge = (category?: string, extraClass = "") => {
+  if (!category) return null;
+  const badge = CATEGORY_BADGES[category];
+  if (!badge) return null;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.05em] px-2 py-0.5 rounded-full ${badge.color} ${extraClass}`.trim()}
+    >
+      {badge.label}
+    </span>
+  );
+};
+
 // Types for Google Places Autocomplete
 interface AutocompleteSuggestion {
   placePrediction: {
@@ -51,32 +82,8 @@ function EnhancedParkingDetail({
   };
   const fallbackImg = "/car_parking.svg";
 
-  const getAvailabilityColor = () => {
-    if (parking.availableSpots <= 3) return 'text-red-400';
-    if (parking.availableSpots <= 8) return 'text-orange-400';
-    return 'text-green-400';
-  };
+  const categoryBadge = renderCategoryBadge(parking.category);
 
-  const getAvailabilityText = () => {
-    if (parking.availableSpots <= 3) return `${parking.availableSpots} left`;
-    if (parking.availableSpots <= 8) return 'Limited availability';
-    return 'Available';
-  };
-
-  const getCategoryBadge = () => {
-    if (!parking.category) return null;
-    const badges: Record<string, { label: string; color: string }> = {
-      'best-value': { label: 'Best Value', color: 'bg-green-600' },
-      'shortest-walk': { label: 'Shortest Walk', color: 'bg-orange-600' },
-      'highest-rated': { label: 'Highest Rated', color: 'bg-purple-600' }
-    };
-    const badge = badges[parking.category];
-    return badge ? (
-      <div className={`inline-flex items-center px-2 py-1 rounded text-white text-xs font-medium ${badge.color} mb-3`}>
-        {badge.label}
-      </div>
-    ) : null;
-  };
 
   return (
     <div className="h-full bg-[#151823] flex flex-col">
@@ -87,7 +94,11 @@ function EnhancedParkingDetail({
         <h2 className="text-xl font-bold text-[#e2e8f0]">Parking Details</h2>
       </div>
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-        {getCategoryBadge()}
+        {categoryBadge && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {categoryBadge}
+          </div>
+        )}
 
         <div className="w-full h-48 rounded-xl overflow-hidden bg-[#2a3441] border border-[#374151] mb-6">
           <Image
@@ -100,7 +111,7 @@ function EnhancedParkingDetail({
         </div>
 
         <h3 className="font-bold text-[#e2e8f0] text-2xl leading-tight mb-3">
-          {parking.name}
+          {formatPlaceName(parking.name)}
         </h3>
         <p className="text-[#94a3b8] text-base mb-6">
           {parking.address}
@@ -112,19 +123,11 @@ function EnhancedParkingDetail({
             <div className="text-sm text-[#94a3b8]">Rating</div>
           </div>
           <div className="bg-[#2a3441] rounded-xl p-4 border border-[#374151]">
-            <div className="text-2xl font-bold text-[#e2e8f0] mb-1">{parking.walkingTime || '5'} min</div>
-            <div className="text-sm text-[#94a3b8]">walk distance</div>
+            <div className="text-2xl font-bold text-[#e2e8f0] mb-1">{parking.walkingTime || '5'} Min</div>
+            <div className="text-sm text-[#94a3b8]">Walk Distance</div>
           </div>
         </div>
 
-        <div className="bg-[#2a3441] rounded-xl p-4 border border-[#374151] mb-6">
-          <div className="flex items-center justify-between">
-            <span className="text-[#e2e8f0] font-medium">Availability</span>
-            <span className={`font-bold ${getAvailabilityColor()}`}>
-              {getAvailabilityText()}
-            </span>
-          </div>
-        </div>
 
         {parking.features && parking.features.length > 0 && (
           <div className="mb-8">
@@ -145,8 +148,8 @@ function EnhancedParkingDetail({
         <div className="bg-[#2a3441] rounded-xl p-6 border border-[#374151]">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-3xl font-bold text-[#e2e8f0]">${parking.pricePerHour}</div>
-              <div className="text-sm text-[#94a3b8]">per hour</div>
+              <div className="text-3xl font-bold text-[#e2e8f0]">₹{parking.pricePerHour}</div>
+              <div className="text-sm text-[#94a3b8]">Per Hour</div>
             </div>
           </div>
           {/* Conditional Reserve Button - Only for Backend Spots */}
@@ -233,31 +236,6 @@ function EnhancedParkingList({
 }) {
   const fallbackImg = "/car_parking.svg";
 
-  const getCategoryBadge = (category?: string) => {
-    switch (category) {
-      case 'best-value':
-        return <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">Best Value</span>;
-      case 'shortest-walk':
-        return <span className="bg-orange-600 text-white text-xs px-2 py-1 rounded">Shortest Walk</span>;
-      case 'highest-rated':
-        return <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded">Highest Rated</span>;
-      default:
-        return null;
-    }
-  };
-
-  const getAvailabilityColor = (available: number) => {
-    if (available <= 3) return 'text-red-400';
-    if (available <= 8) return 'text-orange-400';
-    return 'text-green-400';
-  };
-
-  const getAvailabilityText = (available: number) => {
-    if (available <= 3) return `${available} left`;
-    if (available <= 8) return 'Limited';
-    return 'Available';
-  };
-
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
   return (
@@ -265,8 +243,8 @@ function EnhancedParkingList({
       {locations.length === 0 && (
         <div className="text-[#94a3b8] text-center py-12">
           <div className="text-4xl mb-4">🅿️</div>
-          <div className="text-lg font-medium mb-2">No parking found</div>
-          <div className="text-sm">Try searching for a different location</div>
+          <div className="text-lg font-medium mb-2">No Parking Found</div>
+          <div className="text-sm">Try Searching For A Different Location</div>
         </div>
       )}
       {locations.map((location) => (
@@ -289,30 +267,30 @@ function EnhancedParkingList({
             />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-start gap-2 mb-1">
               <h3 className="font-bold text-[#e2e8f0] text-sm leading-tight truncate">
-                {location.name}
+                {formatPlaceName(location.name)}
               </h3>
-              {/* Backend spot indicator */}
-              {isBookableSpot(location) && (
-                <span className="bg-[#60a5fa] text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium">
-                  BOOKABLE
-                </span>
+              {(isBookableSpot(location) || location.category) && (
+                <div className="ml-auto flex flex-wrap items-center gap-1">
+                  {isBookableSpot(location) && (
+                    <span className="bg-[#60a5fa] text-white text-[10px] font-semibold tracking-[0.05em] px-2 py-0.5 rounded-full">
+                      BOOKABLE
+                    </span>
+                  )}
+                  {renderCategoryBadge(location.category)}
+                </div>
               )}
-              {location.category && getCategoryBadge(location.category)}
             </div>
             <div className="text-xs text-[#94a3b8] truncate mb-1">{location.address}</div>
             <div className="flex items-center gap-2 text-xs">
               <span className="text-[#f59e0b] font-medium">★ {location.rating}</span>
-              <span className="text-[#3b82f6] font-medium">{location.walkingTime || '5'} min</span>
-              <span className={`font-medium ${getAvailabilityColor(location.availableSpots)}`}>
-                {getAvailabilityText(location.availableSpots)}
-              </span>
+              <span className="text-[#3b82f6] font-medium">{location.walkingTime || '5'} Min</span>
             </div>
           </div>
           <div className="text-right flex-shrink-0">
-            <div className="text-lg font-bold text-[#e2e8f0]">${location.pricePerHour}</div>
-            <div className="text-xs text-[#94a3b8]">/hr</div>
+            <div className="text-lg font-bold text-[#e2e8f0]">₹{location.pricePerHour}</div>
+            <div className="text-xs text-[#94a3b8]">/Hr</div>
           </div>
         </div>
       ))}

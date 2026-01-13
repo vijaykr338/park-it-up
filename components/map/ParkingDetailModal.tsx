@@ -169,7 +169,7 @@ export default function ParkingDetailModal({
               <div className="flex items-center gap-1">
                 <FaWalking className="text-[#9ca3af]" />
                 <span className="text-[#e2e8f0]">
-                  {parking.walkingTime} min
+                  {parking.walkingTime} Min
                 </span>
                 <span className="text-[#94a3b8]">
                   ({parking.walkingDistance})
@@ -178,7 +178,7 @@ export default function ParkingDetailModal({
               <div className="flex items-center gap-1">
                 <FaParking className="text-[#60a5fa]" />
                 <span className="font-medium text-[#e2e8f0]">
-                  {parking.availableSpots} spots
+                  {parking.availableSpots} Spots
                 </span>
               </div>
             </div>
@@ -189,10 +189,10 @@ export default function ParkingDetailModal({
             <div className="flex justify-between items-center mb-2">
               <span className="text-[#94a3b8] text-sm">Reservation</span>
               <span className="text-[#e2e8f0] font-bold text-lg">
-                ${parking.pricePerHour}
+                ₹{parking.pricePerHour}
               </span>
             </div>
-            <div className="text-xs text-[#94a3b8]">Duration: 10 hours</div>
+            <div className="text-xs text-[#94a3b8]">Duration: 10 Hours</div>
             <div className="text-xs text-[#94a3b8]">Policy: No In & Out</div>
             <div className="text-xs text-[#60a5fa] mt-2">Free Cancellation</div>
           </div>
@@ -240,7 +240,7 @@ export default function ParkingDetailModal({
               onClick={handleBookNow}
               className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white font-semibold py-3 rounded-xl text-base transition-colors duration-200 mt-2"
             >
-              Book Now - ${parking.pricePerHour}
+              Book Now - ₹{parking.pricePerHour}
             </button>
           ) : (
             <div className="w-full bg-[#374151] text-[#94a3b8] font-semibold py-3 rounded-xl text-base text-center mt-2">
