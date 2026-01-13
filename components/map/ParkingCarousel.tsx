@@ -60,7 +60,7 @@ function ParkingCard({
   };
 
   const getAvailabilityText = () => {
-    if (parking.availableSpots <= 3) return `${parking.availableSpots} left`;
+    if (parking.availableSpots <= 3) return `${parking.availableSpots} Left`;
     if (parking.availableSpots <= 8) return 'Limited';
     return 'Available';
   };
@@ -117,7 +117,7 @@ function ParkingCard({
             </div>
             <div className="flex items-center gap-0.5">
               <FaWalking className="text-[#9ca3af] text-xs" />
-              <span className="text-[#e2e8f0]">{parking.walkingTime}min</span>
+              <span className="text-[#e2e8f0]">{parking.walkingTime} Min</span>
             </div>
           </div>
           <div className={`font-medium ${getAvailabilityColor()}`}>{getAvailabilityText()}</div>
@@ -125,8 +125,8 @@ function ParkingCard({
         {/* Price */}
         <div className="text-center pt-1 border-t border-[#374151]">
           <div className="text-base font-bold text-[#e2e8f0]">
-            ${parking.pricePerHour}
-            <span className="text-xs text-[#9ca3af] font-normal">/hr</span>
+            ₹{parking.pricePerHour}
+            <span className="text-xs text-[#9ca3af] font-normal">/Hr</span>
           </div>
         </div>
         {/* Conditional Book Now Button - Only for Backend Spots */}

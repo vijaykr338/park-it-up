@@ -5,8 +5,8 @@
 */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import api from '@/lib/axios';
-import { ParkingSpot, DjangoAPIResponse } from './types';
+import { parkingApi } from '@/lib/api/parking';
+import { ParkingSpot } from './types';
 
 class ParkingService {
   private googleMaps: any = null;
@@ -31,26 +31,27 @@ class ParkingService {
 
   private async fetchDjangoSpots(lat: number, lng: number): Promise<ParkingSpot[]> {
     try {
-      const response = await api.get<DjangoAPIResponse[]>("/parking/nearby/", {
-        params: { lat, lng }
-      });
+      const response = await parkingApi.nearby(lat, lng);
 
-      return response.data.map((spot) => ({
-        id: `django-${spot.id}`,
-        name: spot.name,
-        address: spot.address,
-        coordinates: [spot.coordinates[0], spot.coordinates[1]], // [lng, lat]
-        pricePerHour: spot.price_per_hour,
-        availableSpots: spot.slots || 0,
-        totalSpots: spot.slots || 0,
-        rating: spot.rating || 4.0,
-        reviewCount: 100,
-        walkingTime: 5,
-        walkingDistance: "0.3mi",
-        photoUrl: spot.image || "/car_parking.svg",
-        features: spot.features || ["Covered", "Security"],
-        distanceKm: spot.distance_km
-      }));
+      return response.data.map((spot) => {
+        const coords = spot.location?.coordinates;
+        return {
+          id: `django-${spot.id}`,
+          name: spot.name,
+          address: spot.address ?? "",
+          coordinates: coords && coords.length >= 2 ? [coords[0], coords[1]] : [lng, lat],
+          pricePerHour: Number(spot.hourly_rate ?? 0),
+          availableSpots: 0,
+          totalSpots: 0,
+          rating: 4.0,
+          reviewCount: 0,
+          walkingTime: 5,
+          walkingDistance: "0.3mi",
+          photoUrl: spot.images?.[0]?.picture_link || "/car_parking.svg",
+          features: ["Covered", "Security"],
+          distanceKm: spot.distance_km,
+        } as ParkingSpot;
+      });
     } catch (error) {
       console.error("Django parking fetch failed:", error);
       return [];

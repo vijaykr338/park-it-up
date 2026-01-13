@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
+import { useBookingDetails } from "@/components/reservation/hooks/useBookingDetails";
 
 // ✅ Local type definitions (no global Window extension)
 type RazorpayOptions = {
@@ -63,16 +64,39 @@ type RazorpayConstructor = new (options: RazorpayOptions) => RazorpayInstance;
 export default function ReceiptPage() {
   const params = useSearchParams();
   const router = useRouter();
-  const ref = params.get("ref") || "BK202509041555";
-  const spot = params.get("spot") || "P10";
-  const amount = 10;
+  const bookingId = params.get("booking");
+  const debugFare = params.get("debugFare");
 
   const [paying, setPaying] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
+  const { booking, isLoading, error } = useBookingDetails(bookingId);
+
+  // Mark this booking as awaiting payment in localStorage
+  React.useEffect(() => {
+    if (bookingId && booking?.exit_time) {
+      localStorage.setItem('unpaidBookingId', bookingId);
+    }
+  }, [bookingId, booking]);
+
+  // Redirect to bookings page if no booking ID or error
+  React.useEffect(() => {
+    if (!bookingId || error) {
+      router.push('/user-bookings');
+    }
+  }, [bookingId, error, router]);
+
   const handlePayment = async () => {
     if (!scriptLoaded) {
       alert("Razorpay SDK is still loading. Please wait.");
+      return;
+    }
+
+    // Use debug fare if available, otherwise use booking fare
+    const fareAmount = debugFare ? parseFloat(debugFare) : booking?.fare;
+    
+    if (!booking || (!fareAmount && fareAmount !== 0)) {
+      alert("No booking data or amount available for payment.");
       return;
     }
 
@@ -86,7 +110,7 @@ export default function ReceiptPage() {
 
     setPaying(true);
     const key = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_xxxxxxxx";
-    const amountPaise = amount * 100;
+    const amountPaise = Math.max(100, Math.abs(fareAmount) * 100); // Ensure positive, minimum ₹1
 
     try {
       // Create order on server
@@ -96,7 +120,7 @@ export default function ReceiptPage() {
         body: JSON.stringify({
           amount: amountPaise,
           currency: "INR",
-          receipt: `rec_${ref}`,
+          receipt: `rec_${bookingId}`,
         }),
       });
 
@@ -113,7 +137,7 @@ export default function ReceiptPage() {
         amount: amountPaise,
         currency: "INR",
         name: "ParkItUp",
-        description: `Final Payment for ${ref}`,
+        description: `Final Payment for ${booking?.id || bookingId}`,
         order_id: order.orderId,
         handler: async function (response: RazorpaySuccessResponse) {
           try {
@@ -130,15 +154,19 @@ export default function ReceiptPage() {
             const verifyData = await verifyResp.json();
 
             if (verifyData.success) {
+              // Payment verified successfully, clear unpaid status and redirect to feedback
+              localStorage.removeItem('unpaidBookingId');
               router.push(
-                `/feedback?ref=${encodeURIComponent(ref)}&spot=${encodeURIComponent(spot)}`
+                `/feedback?ref=${encodeURIComponent(booking?.id?.toString() || bookingId || "")}&spot=${encodeURIComponent(booking?.slot_number?.toString() || "")}`
               );
             } else {
-              alert("Payment verification failed. Please contact support.");
+              // Payment verification failed
+              console.error("Payment verification failed:", verifyData.error);
+              alert(`Payment verification failed: ${verifyData.error || 'Unknown error'}. Please contact support if amount was deducted.`);
             }
           } catch (error) {
             console.error("Verification error:", error);
-            alert("Payment verification failed.");
+            alert("Payment verification failed due to network error. Please contact support if amount was deducted.");
           } finally {
             setPaying(false);
           }
@@ -162,7 +190,7 @@ export default function ReceiptPage() {
       // Handle payment failure
       rzp.on("payment.failed", function (response: RazorpayErrorResponse) {
         console.error("Payment failed:", response.error);
-        alert(`Payment failed: ${response.error.description}`);
+        alert(`Payment failed: ${response.error.description || 'Unknown error occurred'}`);
         setPaying(false);
       });
 
@@ -186,33 +214,70 @@ export default function ReceiptPage() {
       <div className="min-h-screen bg-[#0a121a] text-white">
         <div className="mx-auto w-full max-w-2xl px-4 py-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-4">Receipt</h1>
-          <div className="rounded-xl border border-[#4d84a4]/25 bg-[#232834]/50 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300">Reservation ID</span>
-              <span className="font-semibold">{ref}</span>
+          
+          {isLoading ? (
+            <div className="rounded-xl border border-[#4d84a4]/25 bg-[#232834]/50 p-4">
+              <div className="animate-pulse space-y-3">
+                <div className="h-4 bg-gray-600 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-600 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-600 rounded w-2/3"></div>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300">Location & Spot</span>
-              <span className="font-semibold">Pacific Mall — Spot {spot}</span>
+          ) : booking ? (
+            <div className="rounded-xl border border-[#4d84a4]/25 bg-[#232834]/50 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300">Reservation ID</span>
+                <span className="font-semibold">{booking.id}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300">Location & Spot</span>
+                <span className="font-semibold">{booking.location_name} — Spot {booking.slot_number}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300">Vehicle</span>
+                <span className="font-semibold">{booking.vehicle_plate}</span>
+              </div>
+              {booking.start_time && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">Start Time</span>
+                  <span className="font-semibold">
+                    {new Date(booking.start_time).toLocaleString()}
+                  </span>
+                </div>
+              )}
+              {booking.exit_time && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-300">End Time</span>
+                  <span className="font-semibold">
+                    {new Date(booking.exit_time).toLocaleString()}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300">Amount Due</span>
+                <span className="text-lg font-bold">₹{Math.max(0, debugFare ? parseFloat(debugFare) : booking.fare || 0)}</span>
+              </div>
+              <div className="pt-3 border-t border-[#4d84a4]/20">
+                <button
+                  disabled={paying || !scriptLoaded || (!booking.fare && !debugFare)}
+                  onClick={handlePayment}
+                  className="w-full rounded-lg bg-[#4d84a4] px-5 py-3 font-semibold hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                >
+                  {!scriptLoaded
+                    ? "Loading Payment Gateway..."
+                    : paying
+                    ? "Processing…"
+                    : (!booking.fare && !debugFare)
+                    ? "No Amount Due"
+                    : "Pay with Razorpay"}
+                </button>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300">Amount Due</span>
-              <span className="text-lg font-bold">₹{amount}</span>
+          ) : (
+            <div className="rounded-xl border border-red-500/25 bg-red-900/20 p-4">
+              <p className="text-red-300">Unable to load booking details. Redirecting...</p>
             </div>
-            <div className="pt-3 border-t border-[#4d84a4]/20">
-              <button
-                disabled={paying || !scriptLoaded}
-                onClick={handlePayment}
-                className="w-full rounded-lg bg-[#4d84a4] px-5 py-3 font-semibold hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-              >
-                {!scriptLoaded
-                  ? "Loading Payment Gateway..."
-                  : paying
-                  ? "Processing…"
-                  : "Pay with Razorpay"}
-              </button>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </>

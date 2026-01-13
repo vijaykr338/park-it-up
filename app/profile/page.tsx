@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import api from "@/lib/axios"; // axios instance with token interceptor
 import InlineEditField from "@/components/profile/InlineEditField";
 // Removed app.css import to prevent global style conflicts
@@ -13,15 +12,8 @@ import Navbar from "@/components/ui/Navbar";
 import Footer from "@/components/ui/Footer";
 import AddVehicleModal from "@/components/profile/AddVehicleModal"; // Create or import this component
 import EditVehicleModal from "@/components/profile/EditVehicleModal"; // Import the modal
-
-interface UserInfo {
-  id: string;
-  phone: string;
-  email: string;
-  firstname: string;
-  lastname: string;
-  profile_picture_url: string;
-}
+import { Me } from "@/lib/api/accounts";
+import { useMe, useUpdateMe } from "@/lib/hooks/accounts.hooks";
 
 interface Vehicle {
   vehicle_id: number;
@@ -30,73 +22,37 @@ interface Vehicle {
   vehicle_name: string;
 }
 
-interface VehicleImage {
-  id: number;
-  vehicle: number;
-  picture_link: string;
-  created_at: string;
-}
-
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<UserInfo | null>(null);
+  const { data: user, isLoading: userLoading } = useMe();
+  const updateMe = useUpdateMe();
 
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [vehicleImages, setVehicleImages] = useState<Record<number, VehicleImage[]>>({});
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
   const [editVehicleModalOpen, setEditVehicleModalOpen] = useState(false);
   const [vehicleToEdit, setVehicleToEdit] = useState<Vehicle | null>(null);
 
-  // fetch user
-  async function fetchUser() {
-    try {
-      const res = await api.get<UserInfo>("/user/me/");
-      setUser(res.data);
-    } catch (err) {
-      console.error("Failed to fetch user info:", err);
-    }
-  }
-
-  // fetch vehicles
   async function fetchVehicles() {
     try {
       const res = await api.get<Vehicle[]>("/vehicle/");
       setVehicles(res.data);
 
-      // fetch images for each vehicle
-      res.data.forEach(async (v) => {
-        try {
-          const imgRes = await api.get(`/vehicle/${v.vehicle_id}/images/`);
-          setVehicleImages((prev) => ({
-            ...prev,
-            [v.vehicle_id]: imgRes.data.images,
-          }));
-        } catch (err) {
-          console.error("Failed to fetch vehicle images:", err);
-        }
-      });
     } catch (err) {
       console.error("Failed to fetch vehicles:", err);
     }
   }
 
   useEffect(() => {
-    fetchUser();
     fetchVehicles();
   }, []);
 
   // Handle field updates
-  const handleFieldUpdate = async (field: keyof UserInfo, newValue: string) => {
+  const handleFieldUpdate = async (field: keyof Me, newValue: string) => {
     if (!user) return;
-
-    const updatedUser = { ...user, [field]: newValue };
-    setUser(updatedUser);
-
     try {
-      await api.patch(`/user/update/${user.phone}/`, { [field]: newValue });
+      await updateMe.mutateAsync({ [field]: newValue });
     } catch (error) {
-      console.error(`Failed to update ${field}:`, error);
-      setUser(user); // revert on error
+      console.error('Failed to update field:', error);
     }
   };
 
@@ -107,19 +63,6 @@ export default function ProfilePage() {
       setVehicles(vehicles.filter((v) => v.vehicle_id !== vehicleId));
     } catch (err) {
       console.error("Failed to delete vehicle:", err);
-    }
-  };
-
-  // delete vehicle image
-  const handleDeleteImage = async (pictureId: number, vehicleId: number) => {
-    try {
-      await api.delete(`/vehicle/delete-image/${pictureId}/`);
-      setVehicleImages((prev) => ({
-        ...prev,
-        [vehicleId]: prev[vehicleId].filter((img) => img.id !== pictureId),
-      }));
-    } catch (err) {
-      console.error("Failed to delete vehicle image:", err);
     }
   };
 
@@ -155,7 +98,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (!user) {
+  if (userLoading || !user) {
     return (
       <div className="min-h-screen bg-[#0a121a] text-white p-6 flex items-center justify-center">
         <div className="text-center">
@@ -166,7 +109,7 @@ export default function ProfilePage() {
     );
   }
 
-  const fullName = `${user.firstname} ${user.lastname}`;
+  const fullName = `${user.first_name} ${user.last_name}`;
 
   return (
     <main>
@@ -177,10 +120,9 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <Avatar className="w-32 h-32 border-2 border-[#1985df]">
-                <AvatarImage src={user.profile_picture_url} alt={fullName} />
                 <AvatarFallback className="text-2xl bg-[#232834] text-[#1985df]">
-                  {user.firstname[0]}
-                  {user.lastname[0]}
+                  {user.first_name?.[0] ?? ""}
+                  {user.last_name?.[0] ?? ""}
                 </AvatarFallback>
               </Avatar>
               <div>
@@ -200,13 +142,13 @@ export default function ProfilePage() {
                 <CardContent className="p-6 space-y-4">
                   <InlineEditField
                     label="First name"
-                    value={user.firstname}
-                    onSave={(value) => handleFieldUpdate("firstname", value)}
+                    value={user.first_name}
+                    onSave={(value) => handleFieldUpdate("first_name", value)}
                   />
                   <InlineEditField
                     label="Last name"
-                    value={user.lastname}
-                    onSave={(value) => handleFieldUpdate("lastname", value)}
+                    value={user.last_name}
+                    onSave={(value) => handleFieldUpdate("last_name", value)}
                   />
                   <div className="flex justify-between py-2">
                     <span className="text-gray-400">Email</span>
@@ -272,26 +214,6 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                      {/* Vehicle images */}
-                      <div className="flex flex-wrap gap-3">
-                        {vehicleImages[vehicle.vehicle_id]?.map((img) => (
-                          <div key={img.id} className="relative">
-                            <Image
-                              src={img.picture_link}
-                              alt="vehicle"
-                              width={120}
-                              height={80}
-                              className="rounded-lg border border-[#1985df] object-cover"
-                            />
-                            <button
-                              onClick={() => handleDeleteImage(img.id, vehicle.vehicle_id)}
-                              className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
                     </CardContent>
                   </Card>
                 ))}

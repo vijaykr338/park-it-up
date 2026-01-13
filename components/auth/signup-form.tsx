@@ -8,9 +8,9 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import axiosInstance from '@/lib/axios';
+import axiosInstance from "@/lib/axios";
 import { Eye, EyeOff } from "lucide-react";
-import { useAuthStore } from '@/lib/auth-store';
+import { useAuthStore } from "@/lib/auth-store";
 
 interface FormData {
   firstName: string;
@@ -72,7 +72,9 @@ export function SignupForm({
   // Strong password validation function
   function isStrongPassword(password: string) {
     // At least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(password);
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(
+      password
+    );
   }
 
   // Name validation function
@@ -88,10 +90,10 @@ export function SignupForm({
       lowercase: /[a-z]/.test(password),
       uppercase: /[A-Z]/.test(password),
       number: /\d/.test(password),
-      special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)
+      special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
     };
 
-    Object.values(checks).forEach(check => {
+    Object.values(checks).forEach((check) => {
       if (check) strength++;
     });
 
@@ -104,7 +106,8 @@ export function SignupForm({
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const { firstName, lastName, email, phone, password, cnf_password } = formData;
+    const { firstName, lastName, email, phone, password, cnf_password } =
+      formData;
 
     // Comprehensive validation with specific error messages
     if (!firstName.trim()) {
@@ -114,7 +117,9 @@ export function SignupForm({
     }
 
     if (!isValidName(firstName)) {
-      setError("First name must be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes");
+      setError(
+        "First name must be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes"
+      );
       setLoading(false);
       return;
     }
@@ -126,7 +131,9 @@ export function SignupForm({
     }
 
     if (!isValidName(lastName)) {
-      setError("Last name must be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes");
+      setError(
+        "Last name must be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes"
+      );
       setLoading(false);
       return;
     }
@@ -150,9 +157,9 @@ export function SignupForm({
     }
 
     // Phone number validation
-    const phoneDigits = phone.replace(/\D/g, '');
+    const phoneDigits = phone.replace(/\D/g, "");
     if (phoneDigits.length !== 10) {
-      setError('Phone number must be exactly 10 digits');
+      setError("Phone number must be exactly 10 digits");
       setLoading(false);
       return;
     }
@@ -185,9 +192,9 @@ export function SignupForm({
 
     try {
       // Register user
-      const res = await axiosInstance.post('/user/signup/', {
-        firstname: firstName,
-        lastname: lastName,
+      const res = await axiosInstance.post("/accounts/user/register/", {
+        first_name: firstName,
+        last_name: lastName,
         email,
         phone: phoneDigits,
         password,
@@ -196,23 +203,39 @@ export function SignupForm({
       if (res.status === 201) {
         // Auto-login after registration
         try {
-          const loginRes = await axiosInstance.post('/user/login/', {
-            phone,
+          const loginRes = await axiosInstance.post("/accounts/user/login/", {
+            phone: phoneDigits,
             password,
           });
-          if (loginRes.status === 200 && loginRes.data.access && loginRes.data.refresh) {
+
+          if (
+            loginRes.status === 200 &&
+            loginRes.data.access &&
+            loginRes.data.refresh
+          ) {
             authLogin(loginRes.data.access, loginRes.data.refresh);
             setError(null);
             router.push("/profile");
           } else {
-            setError("Account created, but login failed. Please try logging in.");
+            setError(
+              "Account created, but login failed. Please try logging in."
+            );
           }
         } catch (loginErr: unknown) {
-          if (loginErr && typeof loginErr === 'object' && 'response' in loginErr) {
+          if (
+            loginErr &&
+            typeof loginErr === "object" &&
+            "response" in loginErr
+          ) {
             const loginResponse = (loginErr as ApiErrorResponse).response;
-            setError(loginResponse?.data?.message || "Account created, but login failed. Please try logging in.");
+            setError(
+              loginResponse?.data?.message ||
+                "Account created, but login failed. Please try logging in."
+            );
           } else {
-            setError("Account created, but login failed. Please try logging in.");
+            setError(
+              "Account created, but login failed. Please try logging in."
+            );
           }
         }
       } else {
@@ -220,26 +243,35 @@ export function SignupForm({
       }
     } catch (err: unknown) {
       console.error("Signup error:", err);
-      if (err && typeof err === 'object' && 'response' in err) {
+      if (err && typeof err === "object" && "response" in err) {
         const response = (err as ApiErrorResponse).response;
         if (response?.status === 400) {
           // Handle specific validation errors from backend
           const errorData = response.data;
           if (errorData?.email) {
-            setError("This email is already registered. Please use a different email or try logging in.");
+            setError(
+              "This email is already registered. Please use a different email or try logging in."
+            );
           } else if (errorData?.phone) {
-            setError("This phone number is already registered. Please use a different number or try logging in.");
+            setError(
+              "This phone number is already registered. Please use a different number or try logging in."
+            );
           } else if (errorData?.message) {
             setError(errorData.message);
           } else {
             setError("Please check your information and try again.");
           }
         } else if (response?.status === 409) {
-          setError("An account with this email or phone number already exists.");
+          setError(
+            "An account with this email or phone number already exists."
+          );
         } else if (response?.status && response.status >= 500) {
           setError("Server error. Please try again later.");
         } else {
-          setError(response?.data?.message || "An error occurred while creating account");
+          setError(
+            response?.data?.message ||
+              "An error occurred while creating account"
+          );
         }
       } else {
         setError("Network error. Please check your connection and try again.");
@@ -343,7 +375,9 @@ export function SignupForm({
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
                     onClick={() => setShowPassword((v) => !v)}
                     tabIndex={-1}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -354,33 +388,64 @@ export function SignupForm({
                       {[1, 2, 3, 4, 5].map((level) => (
                         <div
                           key={level}
-                          className={`h-1 flex-1 rounded ${level <= passwordStrength.strength
+                          className={`h-1 flex-1 rounded ${
+                            level <= passwordStrength.strength
                               ? passwordStrength.strength <= 2
-                                ? 'bg-red-500'
+                                ? "bg-red-500"
                                 : passwordStrength.strength <= 3
-                                  ? 'bg-yellow-500'
-                                  : 'bg-green-500'
-                              : 'bg-gray-600'
-                            }`}
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
+                              : "bg-gray-600"
+                          }`}
                         />
                       ))}
                     </div>
                     <div className="text-xs text-gray-400">
                       Password must contain:
                       <ul className="mt-1 space-y-1">
-                        <li className={passwordStrength.checks.length ? 'text-green-400' : 'text-gray-400'}>
+                        <li
+                          className={
+                            passwordStrength.checks.length
+                              ? "text-green-400"
+                              : "text-gray-400"
+                          }
+                        >
                           ✓ At least 8 characters
                         </li>
-                        <li className={passwordStrength.checks.lowercase ? 'text-green-400' : 'text-gray-400'}>
+                        <li
+                          className={
+                            passwordStrength.checks.lowercase
+                              ? "text-green-400"
+                              : "text-gray-400"
+                          }
+                        >
                           ✓ One lowercase letter
                         </li>
-                        <li className={passwordStrength.checks.uppercase ? 'text-green-400' : 'text-gray-400'}>
+                        <li
+                          className={
+                            passwordStrength.checks.uppercase
+                              ? "text-green-400"
+                              : "text-gray-400"
+                          }
+                        >
                           ✓ One uppercase letter
                         </li>
-                        <li className={passwordStrength.checks.number ? 'text-green-400' : 'text-gray-400'}>
+                        <li
+                          className={
+                            passwordStrength.checks.number
+                              ? "text-green-400"
+                              : "text-gray-400"
+                          }
+                        >
                           ✓ One number
                         </li>
-                        <li className={passwordStrength.checks.special ? 'text-green-400' : 'text-gray-400'}>
+                        <li
+                          className={
+                            passwordStrength.checks.special
+                              ? "text-green-400"
+                              : "text-gray-400"
+                          }
+                        >
                           ✓ One special character
                         </li>
                       </ul>
@@ -406,7 +471,9 @@ export function SignupForm({
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
                     onClick={() => setShowCnfPassword((v) => !v)}
                     tabIndex={-1}
-                    aria-label={showCnfPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showCnfPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showCnfPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -417,12 +484,11 @@ export function SignupForm({
                 disabled={loading}
                 className="w-full bg-[#4d84a4] hover:bg-slate-700 border border-white"
               >
-                {loading ? 'Creating account…' : 'Sign Up'}
+                {loading ? "Creating account…" : "Sign Up"}
               </Button>
 
               {/* Social login and other UI parts untouched */}
               {/* ... */}
-
 
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-[#141a24] text-white relative z-10 px-2">
@@ -430,7 +496,11 @@ export function SignupForm({
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-4">
-                <Button variant="outline" type="button" className="w-full text-white bg-[#141a24] hover:bg-[#4d84a4] hover:text-white">
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="w-full text-white bg-[#141a24] hover:bg-[#4d84a4] hover:text-white"
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
                       d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
@@ -439,7 +509,11 @@ export function SignupForm({
                   </svg>
                   <span className="sr-only">Login with Apple</span>
                 </Button>
-                <Button variant="outline" type="button" className="w-full text-white bg-[#141a24] hover:bg-[#4d84a4] hover:text-white">
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="w-full text-white bg-[#141a24] hover:bg-[#4d84a4] hover:text-white"
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
                       d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
@@ -448,7 +522,11 @@ export function SignupForm({
                   </svg>
                   <span className="sr-only">Login with Google</span>
                 </Button>
-                <Button variant="outline" type="button" className="w-full text-white bg-[#141a24] hover:bg-[#4d84a4] hover:text-white">
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="w-full text-white bg-[#141a24] hover:bg-[#4d84a4] hover:text-white"
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
                       d="M6.915 4.03c-1.968 0-3.683 1.28-4.871 3.113C.704 9.208 0 11.883 0 14.449c0 .706.07 1.369.21 1.973a6.624 6.624 0 0 0 .265.86 5.297 5.297 0 0 0 .371.761c.696 1.159 1.818 1.927 3.593 1.927 1.497 0 2.633-.671 3.965-2.444.76-1.012 1.144-1.626 2.663-4.32l.756-1.339.186-.325c.061.1.121.196.183.3l2.152 3.595c.724 1.21 1.665 2.556 2.47 3.314 1.046.987 1.992 1.22 3.06 1.22 1.075 0 1.876-.355 2.455-.843a3.743 3.743 0 0 0 .81-.973c.542-.939.861-2.127.861-3.745 0-2.72-.681-5.357-2.084-7.45-1.282-1.912-2.957-2.93-4.716-2.93-1.047 0-2.088.467-3.053 1.308-.652.57-1.257 1.29-1.82 2.05-.69-.875-1.335-1.547-1.958-2.056-1.182-.966-2.315-1.303-3.454-1.303zm10.16 2.053c1.147 0 2.188.758 2.992 1.999 1.132 1.748 1.647 4.195 1.647 6.4 0 1.548-.368 2.9-1.839 2.9-.58 0-1.027-.23-1.664-1.004-.496-.601-1.343-1.878-2.832-4.358l-.617-1.028a44.908 44.908 0 0 0-1.255-1.98c.07-.109.141-.224.211-.327 1.12-1.667 2.118-2.602 3.358-2.602zm-10.201.553c1.265 0 2.058.791 2.675 1.446.307.327.737.871 1.234 1.579l-1.02 1.566c-.757 1.163-1.882 3.017-2.837 4.338-1.191 1.649-1.81 1.817-2.486 1.817-.524 0-1.038-.237-1.383-.794-.263-.426-.464-1.13-.464-2.046 0-2.221.63-4.535 1.66-6.088.454-.687.964-1.226 1.533-1.533a2.264 2.264 0 0 1 1.088-.285z"
@@ -472,8 +550,8 @@ export function SignupForm({
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-secondary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our{" "}
-        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+        and <a href="#">Privacy Policy</a>.
       </div>
     </div>
   );
