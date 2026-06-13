@@ -8,7 +8,8 @@ interface ParkingCarouselProps {
   selectedParking: ParkingSpot | null;
   onParkingSelect: (parking: ParkingSpot) => void;
   onCardTap: (parking: ParkingSpot) => void;
-  onClose: () => void;
+  // onClose is currently unused; keep for future modal handling.
+  onClose?: () => void;
 }
 
 function ParkingCard({ 
@@ -34,6 +35,7 @@ function ParkingCard({
         }
       `}
       onClick={onClick}
+      onDoubleClick={onTap}
     >
       {/* Badges */}
       <div className="mb-1" />
@@ -83,7 +85,7 @@ export default function ParkingCarousel({
   selectedParking,
   onParkingSelect,
   onCardTap,
-  // onClose
+  // onClose is optional and currently unused
 }: ParkingCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
