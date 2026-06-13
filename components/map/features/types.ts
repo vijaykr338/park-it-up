@@ -1,5 +1,6 @@
 export interface ParkingSpot {
   id: string;
+  source?: 'backend' | 'google-cloud';
   name: string;
   address: string;
   coordinates: [number, number]; // [lng, lat]
@@ -15,11 +16,6 @@ export interface ParkingSpot {
   category?: 'best-value' | 'shortest-walk' | 'highest-rated';
   distanceKm?: number;
 }
-
-// Helper function to check if a parking spot is bookable (from backend)
-export const isBookableSpot = (parking: ParkingSpot): boolean => {
-  return parking.id.startsWith('django-');
-};
 
 export interface DjangoAPIResponse {
   id: number;

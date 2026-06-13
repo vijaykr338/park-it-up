@@ -1,11 +1,11 @@
+/* @ts-nocheck */
 import type { Metadata } from 'next'
 import './globals.css'
 import Providers from './providers'
-import Script from 'next/script'
 
 export const metadata: Metadata = {
   title: 'ParkItUp',
-  description: 'Find and reserve parking spots easily',
+  description: 'Find parking spots near you',
 }
 
 export default function RootLayout({
@@ -16,8 +16,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* ...other head tags... */}
-        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
       </head>
       <body>
         <Providers>

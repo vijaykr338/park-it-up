@@ -36,14 +36,6 @@ export default function ParkingDetail({ place, onClose }: ParkingDetailProps) {
         {place.rating && (
           <div className="mb-2 text-[#f59e0b]">★ {place.rating}</div>
         )}
-        {place.priceLevel && (
-          <div className="mb-2 text-[#10b981]">Price Level: {place.priceLevel}</div>
-        )}
-        <div className="mt-6">
-          <button className="w-full py-3 rounded-lg bg-[#4A6CF7] hover:bg-[#3b5ae0] text-white font-semibold text-base transition-all duration-200 shadow-lg hover:shadow-xl hover:shadow-[#4A6CF7]/25 active:scale-[0.98]">
-            Book This Parking
-          </button>
-        </div>
       </div>
     </div>
   );

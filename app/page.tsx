@@ -1,7 +1,7 @@
 import React from 'react';
-import { Herosection, Statsection, Features, Testimonial, Ctasection } from '@/components/homepage';
 import Navbar from '@/components/ui/Navbar';
 import Footer from '@/components/ui/Footer';
+import { Herosection, Statsection, Features, Testimonial, Ctasection } from '@/components/homepage';
 
 export default function Home() {
   return (
@@ -12,7 +12,6 @@ export default function Home() {
       <Features />
       <Testimonial />
       <Ctasection />
-      
       <Footer />
     </main>
   );

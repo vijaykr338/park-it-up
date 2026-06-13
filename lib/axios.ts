@@ -3,7 +3,7 @@
 import axios, { AxiosError, AxiosInstance, type AxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/lib/auth-store";
 
-const baseURL = (process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000/api").replace(/\/+$/, "");
+const baseURL = (process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000").replace(/\/+$/, "");
 const refreshPath = "/accounts/user/refresh/";
 
 type RetryConfig = AxiosRequestConfig & {

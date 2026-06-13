@@ -9,6 +9,9 @@ export type ParkingLocationSummary = {
     coordinates: [number, number]; // [lng, lat]
   };
   hourly_rate: string;
+  slots?: number;
+  available_slots?: number;
+  total_slots?: number;
   images: Array<{ id: number; picture_link: string | null }>;
   // added by NearbyParkingView
   distance_km?: number;

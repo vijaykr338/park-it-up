@@ -7,18 +7,9 @@ import {
   FaArrowLeft,
   FaArrowRight,
   FaShieldAlt,
-  FaApple,
-  FaGooglePay,
-  FaCcVisa,
-  FaCcMastercard,
-  FaCcAmex,
-  FaCcDiscover,
 } from "react-icons/fa";
-import { SiPaypal } from "react-icons/si";
-import { ParkingSpot, isBookableSpot } from "./features/types";
+import { ParkingSpot } from "./features/types";
 import Image from "next/image";
-import { useAuthStore } from "@/lib/auth-store";
-import AuthModal from "@/components/ui/AuthModal";
 
 interface ParkingDetailModalProps {
   parking: ParkingSpot;
@@ -32,8 +23,6 @@ export default function ParkingDetailModal({
   isModal = true,
 }: ParkingDetailModalProps) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const isAuthenticated = !!useAuthStore((state) => state.access);
 
   // Mock photos for carousel
   const photos = [
@@ -50,32 +39,6 @@ export default function ParkingDetailModal({
 
   const prevPhoto = () => {
     setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
-  };
-
-  const getCategoryBadge = () => {
-    if (!parking.category) return null;
-    const badges = {
-      "best-value": { label: "Best Value", color: "bg-green-600" },
-      "shortest-walk": { label: "Shortest Walk", color: "bg-orange-600" },
-      "highest-rated": { label: "Highest Rated", color: "bg-purple-600" },
-    };
-    const badge = badges[parking.category];
-    return (
-      <div
-        className={`inline-flex items-center px-2 py-1 rounded text-white text-xs font-semibold ${badge.color} mb-3`}
-      >
-        {badge.label}
-      </div>
-    );
-  };
-
-  const handleBookNow = () => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-      return;
-    }
-    // Redirect to zone + slot selection before booking
-    window.location.href = `/booking/select-zone?location=${String(parking.id).replace(/^django-/, "")}`;
   };
 
   return (
@@ -109,8 +72,7 @@ export default function ParkingDetailModal({
           </button>
         </div>
 
-        {/* Category Badge */}
-        <div className="px-4 pt-4">{getCategoryBadge()}</div>
+        <div className="px-4 pt-4" />
 
         {/* Photo Carousel */}
         <div className="relative px-4 pt-2">
@@ -178,38 +140,11 @@ export default function ParkingDetailModal({
               <div className="flex items-center gap-1">
                 <FaParking className="text-[#60a5fa]" />
                 <span className="font-medium text-[#e2e8f0]">
-                  {parking.availableSpots} Spots
+                  {parking.source === 'backend'
+                    ? `${parking.availableSpots}/${parking.totalSpots || parking.availableSpots} Slots`
+                    : 'Parking Spot'}
                 </span>
               </div>
-            </div>
-          </div>
-
-          {/* Reservation Details */}
-          <div className="bg-[#23263a] rounded-xl p-4 border border-[#374151]">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-[#94a3b8] text-sm">Reservation</span>
-              <span className="text-[#e2e8f0] font-bold text-lg">
-                ₹{parking.pricePerHour}
-              </span>
-            </div>
-            <div className="text-xs text-[#94a3b8]">Duration: 10 Hours</div>
-            <div className="text-xs text-[#94a3b8]">Policy: No In & Out</div>
-            <div className="text-xs text-[#60a5fa] mt-2">Free Cancellation</div>
-          </div>
-
-          {/* Payment Methods */}
-          <div>
-            <div className="text-[#e2e8f0] font-semibold mb-2">
-              Accepted Payment Methods
-            </div>
-            <div className="flex flex-wrap gap-3 text-2xl text-[#e2e8f0]">
-              <FaApple title="Apple Pay" />
-              <FaGooglePay title="Google Pay" />
-              <SiPaypal title="PayPal" />
-              <FaCcVisa title="VISA" />
-              <FaCcMastercard title="MasterCard" />
-              <FaCcAmex title="American Express" />
-              <FaCcDiscover title="Discover" />
             </div>
           </div>
 
@@ -234,33 +169,8 @@ export default function ParkingDetailModal({
             </div>
           </div>
 
-          {/* Conditional Book Now Button - Only for Backend Spots */}
-          {isBookableSpot(parking) ? (
-            <button 
-              onClick={handleBookNow}
-              className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white font-semibold py-3 rounded-xl text-base transition-colors duration-200 mt-2"
-            >
-              Book Now - ₹{parking.pricePerHour}
-            </button>
-          ) : (
-            <div className="w-full bg-[#374151] text-[#94a3b8] font-semibold py-3 rounded-xl text-base text-center mt-2">
-              <div className="flex items-center justify-center gap-2">
-                <span>📍</span>
-                <span>Reference Location Only</span>
-              </div>
-              <div className="text-xs mt-1 opacity-75">
-                This location is for reference. Booking not available.
-              </div>
-            </div>
-          )}
         </div>
       </div>
-
-      {/* Authentication Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
-      />
     </div>
   );
 }

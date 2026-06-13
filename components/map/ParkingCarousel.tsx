@@ -1,9 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Image from "next/image";
 import { FaStar, FaWalking} from 'react-icons/fa';
-import { ParkingSpot, isBookableSpot } from './features/types';
-import { useAuthStore } from "@/lib/auth-store";
-import AuthModal from "@/components/ui/AuthModal";
+import { ParkingSpot } from './features/types';
 
 interface ParkingCarouselProps {
   parkingLocations: ParkingSpot[];
@@ -24,46 +22,7 @@ function ParkingCard({
   onClick: () => void; 
   onTap: () => void; 
 }) {
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const isAuthenticated = !!useAuthStore((state) => state.access);
-
-  const handleBookNow = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-      return;
-    }
-    onTap();
-  };
   const fallbackImg = "/car_parking.svg";
-
-  const getCategoryBadge = () => {
-    if (!parking.category) return null;
-    const badges: Record<string, { label: string; color: string }> = {
-      'best-value': { label: 'Best Value', color: 'bg-green-600' },
-      'shortest-walk': { label: 'Shortest Walk', color: 'bg-orange-600' },
-      'highest-rated': { label: 'Highest Rated', color: 'bg-purple-600' }
-    };
-    const badge = badges[parking.category];
-    if (!badge) return null;
-    return (
-      <div className={`${badge.color} text-white px-1.5 py-0.5 rounded-full text-[10px] font-medium mb-1`}>
-        {badge.label}
-      </div>
-    );
-  };
-
-  const getAvailabilityColor = () => {
-    if (parking.availableSpots <= 3) return 'text-red-400';
-    if (parking.availableSpots <= 8) return 'text-orange-400';
-    return 'text-green-400';
-  };
-
-  const getAvailabilityText = () => {
-    if (parking.availableSpots <= 3) return `${parking.availableSpots} Left`;
-    if (parking.availableSpots <= 8) return 'Limited';
-    return 'Available';
-  };
 
   return (
     <div 
@@ -77,16 +36,7 @@ function ParkingCard({
       onClick={onClick}
     >
       {/* Badges */}
-      <div className="flex items-center gap-1 mb-1">
-        {/* Backend spot indicator */}
-        {isBookableSpot(parking) && (
-          <span className="bg-[#60a5fa] text-white text-[8px] px-1 py-0.5 rounded-full font-medium">
-            BOOKABLE
-          </span>
-        )}
-        {/* Category Badge */}
-        {getCategoryBadge()}
-      </div>
+      <div className="mb-1" />
 
       {/* Parking Image */}
       <div className="mb-2">
@@ -120,35 +70,10 @@ function ParkingCard({
               <span className="text-[#e2e8f0]">{parking.walkingTime} Min</span>
             </div>
           </div>
-          <div className={`font-medium ${getAvailabilityColor()}`}>{getAvailabilityText()}</div>
+          <div className="font-medium text-[#cbd5e1]">&nbsp;</div>
         </div>
-        {/* Price */}
-        <div className="text-center pt-1 border-t border-[#374151]">
-          <div className="text-base font-bold text-[#e2e8f0]">
-            ₹{parking.pricePerHour}
-            <span className="text-xs text-[#9ca3af] font-normal">/Hr</span>
-          </div>
-        </div>
-        {/* Conditional Book Now Button - Only for Backend Spots */}
-        {isBookableSpot(parking) ? (
-          <button
-            onClick={handleBookNow}
-            className="w-full bg-[#60a5fa] hover:bg-[#3b82f6] text-white font-medium py-1 px-2 rounded-lg transition-colors text-xs mt-1 text-center"
-          >
-            Book Now
-          </button>
-        ) : (
-          <div className="w-full bg-[#374151] text-[#94a3b8] font-medium py-1 px-2 rounded-lg text-xs mt-1 text-center cursor-not-allowed">
-            View Only
-          </div>
-        )}
+        <div className="text-center pt-1 border-t border-[#374151]" />
       </div>
-
-      {/* Authentication Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
-      />
     </div>
   );
 }

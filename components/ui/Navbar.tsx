@@ -1,58 +1,19 @@
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import ParkitUp from '@/components/assets/Parkitup_logo.png';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
-import { useAuthStore } from '@/lib/auth-store';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Navbar = () => {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const isAuthenticated = !!useAuthStore((state) => state.access);
-  const logout = useAuthStore((state) => state.logout);
   const router = useRouter();
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowProfileDropdown(false);
-      }
-    }
-
-    function handleEscapeKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setShowProfileDropdown(false);
-      }
-    }
-
-    if (showProfileDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscapeKey);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscapeKey);
-    };
-  }, [showProfileDropdown]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const handleLogout = () => {
-    logout();
-    router.push('/');
   };
 
   const handleSectionClick = (sectionId: string) => {
@@ -119,103 +80,6 @@ const Navbar = () => {
             })}
           </div>
 
-          {/* Desktop auth / profile */}
-          <div className="hidden md:flex items-center space-x-3">
-            {isAuthenticated && (
-              <Link href="/user-bookings">
-                <Button 
-                  variant="outline" 
-                  className="border-[#4d84a4] text-[#4d84a4] hover:bg-[#4d84a4] hover:text-white text-sm px-3 py-2"
-                >
-                  <span className="hidden lg:inline">My Bookings</span>
-                  <span className="lg:hidden">Bookings</span>
-                </Button>
-              </Link>
-            )}
-            {isAuthenticated ? (
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  className="flex items-center focus:outline-none hover:opacity-80 transition-opacity"
-                  onClick={() => setShowProfileDropdown((v) => !v)}
-                >
-                  <Avatar className="w-8 h-8 border border-[#4d84a4]">
-                    <AvatarImage src="/default-avatar.png" alt="Profile" />
-                    <AvatarFallback>
-                      <span role="img" aria-label="profile">👤</span>
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-                {showProfileDropdown && (
-                  <div
-                    className="absolute right-0 mt-2 w-48 bg-[#232834] rounded-lg shadow-xl z-[100001] border border-[#4d84a4] overflow-hidden"
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      right: 0,
-                      marginTop: '8px',
-                      pointerEvents: 'auto',
-                      zIndex: 100001
-                    }}
-                  >
-                    <div className="py-1">
-                      <button
-                        className="block w-full text-left px-4 py-3 text-white hover:bg-[#4d84a4] transition-colors duration-200 cursor-pointer border-none bg-transparent"
-                        style={{ pointerEvents: 'auto' }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#4d84a4';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                        }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setShowProfileDropdown(false);
-                          router.push("/profile");
-                        }}
-                      >
-                        Profile
-                      </button>
-                      <button
-                        className="block w-full text-left px-4 py-3 text-red-400 hover:bg-red-600 hover:text-white transition-colors duration-200 cursor-pointer border-none bg-transparent"
-                        style={{ pointerEvents: 'auto' }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#dc2626';
-                          e.currentTarget.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = '#f87171';
-                        }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setShowProfileDropdown(false);
-                          handleLogout();
-                        }}
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button className="bg-white text-[#4d84a4] rounded-full hover:bg-[#4d84a4] hover:text-white cursor-pointer">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href='/signup'>
-                  <Button className="bg-[#4d84a4] rounded-full hover:bg-white cursor-pointer hover:text-[#4d84a4]" >
-                    Sign Up
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <Button
@@ -251,53 +115,6 @@ const Navbar = () => {
                   </Link>
                 );
               })}
-              <div className="pt-4 border-t border-gray-800 space-y-2">
-                {isAuthenticated ? (
-                  <>
-                    <Link
-                      href="/user-bookings"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block w-full text-center py-2 px-4 bg-[#4d84a4] text-white rounded-full hover:bg-[#3a6b85] transition-colors"
-                    >
-                      My Bookings
-                    </Link>
-                    <Link
-                      href="/profile"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block w-full text-center py-2 px-4 bg-[#4d84a4] text-white rounded-full hover:bg-[#3a6b85] transition-colors"
-                    >
-                      Profile
-                    </Link>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setIsMobileMenuOpen(false);
-                        handleLogout();
-                      }}
-                      className="block w-full text-center py-2 px-4 bg-red-500 text-white rounded-full hover:bg-red-700 transition-colors cursor-pointer"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/login"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block w-full text-center py-2 px-4 bg-white text-[#4d84a4] rounded-full hover:bg-[#4d84a4] hover:text-white transition-colors"
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      href="/signup"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block w-full text-center py-2 px-4 bg-[#4d84a4] text-white rounded-full hover:bg-white hover:text-[#4d84a4] transition-colors"
-                    >
-                      Sign Up
-                    </Link>
-                  </>
-                )}
-              </div>
             </div>
           </div>
         )}

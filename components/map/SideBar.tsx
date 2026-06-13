@@ -6,18 +6,9 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import Image from "next/image";
 import { useParkingData } from "./features/useParkingData";
-import { ParkingSpot, isBookableSpot } from "./features/types";
+import { ParkingSpot } from "./features/types";
 import { useQueryParams } from "./useQueryParams";
 import MapContainer from "./MapContainer";
-import { useAuthStore } from "@/lib/auth-store";
-import AuthModal from "@/components/ui/AuthModal";
-import "./sidebar-scroll.css";
-
-const CATEGORY_BADGES: Record<string, { label: string; color: string }> = {
-  "best-value": { label: "Best Value", color: "bg-green-600" },
-  "shortest-walk": { label: "Shortest Walk", color: "bg-orange-600" },
-  "highest-rated": { label: "Highest Rated", color: "bg-purple-600" }
-};
 
 const formatPlaceName = (value?: string | null) => {
   if (!value) return "";
@@ -29,19 +20,6 @@ const formatPlaceName = (value?: string | null) => {
     })
     .join(" ")
     .trim();
-};
-
-const renderCategoryBadge = (category?: string, extraClass = "") => {
-  if (!category) return null;
-  const badge = CATEGORY_BADGES[category];
-  if (!badge) return null;
-  return (
-    <span
-      className={`inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.05em] px-2 py-0.5 rounded-full ${badge.color} ${extraClass}`.trim()}
-    >
-      {badge.label}
-    </span>
-  );
 };
 
 // Types for Google Places Autocomplete
@@ -69,21 +47,7 @@ function EnhancedParkingDetail({
   parking: ParkingSpot;
   onClose: () => void;
 }) {
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const isAuthenticated = !!useAuthStore((state) => state.access);
-
-  const handleReserveClick = () => {
-    if (!isAuthenticated) {
-      setShowAuthModal(true);
-      return;
-    }
-    // If authenticated, proceed with booking
-    window.location.href = `/booking/select-spot?location=${String(parking.id).replace(/^django-/, "")}`;
-  };
   const fallbackImg = "/car_parking.svg";
-
-  const categoryBadge = renderCategoryBadge(parking.category);
-
 
   return (
     <div className="h-full bg-[#151823] flex flex-col">
@@ -94,12 +58,6 @@ function EnhancedParkingDetail({
         <h2 className="text-xl font-bold text-[#e2e8f0]">Parking Details</h2>
       </div>
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-        {categoryBadge && (
-          <div className="flex flex-wrap gap-2 mb-3">
-            {categoryBadge}
-          </div>
-        )}
-
         <div className="w-full h-48 rounded-xl overflow-hidden bg-[#2a3441] border border-[#374151] mb-6">
           <Image
             src={parking.photoUrl || fallbackImg}
@@ -128,7 +86,6 @@ function EnhancedParkingDetail({
           </div>
         </div>
 
-
         {parking.features && parking.features.length > 0 && (
           <div className="mb-8">
             <h4 className="text-[#e2e8f0] font-semibold mb-3">Features</h4>
@@ -145,40 +102,7 @@ function EnhancedParkingDetail({
           </div>
         )}
 
-        <div className="bg-[#2a3441] rounded-xl p-6 border border-[#374151]">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <div className="text-3xl font-bold text-[#e2e8f0]">₹{parking.pricePerHour}</div>
-              <div className="text-sm text-[#94a3b8]">Per Hour</div>
-            </div>
-          </div>
-          {/* Conditional Reserve Button - Only for Backend Spots */}
-          {isBookableSpot(parking) ? (
-            <button
-              onClick={handleReserveClick}
-              className="w-full bg-[#3b82f6] hover:bg-[#2563eb] text-white py-4 rounded-xl font-bold text-base transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              Reserve This Spot
-            </button>
-          ) : (
-            <div className="w-full bg-[#374151] text-[#94a3b8] py-4 rounded-xl font-bold text-base text-center">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <span>📍</span>
-                <span>Reference Only</span>
-              </div>
-              <div className="text-xs opacity-75">
-                Booking not available for this location
-              </div>
-            </div>
-          )}
-        </div>
       </div>
-
-      {/* Authentication Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
     </div>
   );
 }
@@ -238,6 +162,17 @@ function EnhancedParkingList({
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
+  // Determine background color for a spot based on source and availability.
+  const getAvailabilityColor = (spot: ParkingSpot) => {
+    if (spot.source !== 'backend') return 'bg-sky-600'; // Google spots are blue
+    const total = spot.totalSpots || 0;
+    if (!total) return 'bg-green-600';
+    const ratio = spot.availableSpots / total;
+    if (ratio <= 0.2) return 'bg-red-600';
+    if (ratio <= 0.5) return 'bg-yellow-600';
+    return 'bg-green-600';
+  };
+
   return (
     <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar space-y-3">
       {locations.length === 0 && (
@@ -271,26 +206,14 @@ function EnhancedParkingList({
               <h3 className="font-bold text-[#e2e8f0] text-sm leading-tight truncate">
                 {formatPlaceName(location.name)}
               </h3>
-              {(isBookableSpot(location) || location.category) && (
-                <div className="ml-auto flex flex-wrap items-center gap-1">
-                  {isBookableSpot(location) && (
-                    <span className="bg-[#60a5fa] text-white text-[10px] font-semibold tracking-[0.05em] px-2 py-0.5 rounded-full">
-                      BOOKABLE
-                    </span>
-                  )}
-                  {renderCategoryBadge(location.category)}
-                </div>
-              )}
             </div>
             <div className="text-xs text-[#94a3b8] truncate mb-1">{location.address}</div>
             <div className="flex items-center gap-2 text-xs">
               <span className="text-[#f59e0b] font-medium">★ {location.rating}</span>
               <span className="text-[#3b82f6] font-medium">{location.walkingTime || '5'} Min</span>
+              {/* Availability indicator */}
+              <span className={`inline-block w-2 h-2 rounded-full ${getAvailabilityColor(location)} ml-2`}></span>
             </div>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <div className="text-lg font-bold text-[#e2e8f0]">₹{location.pricePerHour}</div>
-            <div className="text-xs text-[#94a3b8]">/Hr</div>
           </div>
         </div>
       ))}
@@ -358,7 +281,8 @@ export default function SideBar({
         region: "IN"
       });
 
-      setSuggestions((autocompleteSuggestions || []).filter(s => s.placePrediction !== null) as AutocompleteSuggestion[]);
+      const typedSuggestions = (autocompleteSuggestions || []) as AutocompleteSuggestion[];
+      setSuggestions(typedSuggestions.filter((suggestion) => suggestion.placePrediction !== null));
       setShowSuggestions(true);
     } catch {
       setSuggestions([]);
@@ -471,11 +395,6 @@ export default function SideBar({
         <div className="text-[#94a3b8] text-sm">
           {isLoading ? 'Loading...' : `${parkingSpots.length} spots found`}
         </div>
-        <select className="bg-[#2a2f3e] text-[#e2e8f0] border border-[#374151] rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/60">
-          <option value="popularity">Sort by Popularity</option>
-          <option value="price">Sort by Price</option>
-          <option value="distance">Sort by Distance</option>
-        </select>
       </div>
 
       {/* Content based on tab */}

@@ -19,26 +19,41 @@ interface ParkingMarkerProps {
 
 function ParkingMarker({ parking, isSelected, onClick }: ParkingMarkerProps) {
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const markerLabel =
+    parking.source === 'backend' && parking.totalSpots > 0
+      ? `${parking.availableSpots}/${parking.totalSpots}`
+      : 'P';
+
+  // Determine background color for a marker.
+  //   • Google spots: always blue (sky-600).
+  //   • Django (backend) spots: red/yellow/green based on remaining slots.
+  const getAvailabilityColor = () => {
+    if (!parking.totalSpots) return "bg-green-600"; // fallback
+    const ratio = parking.availableSpots / parking.totalSpots;
+    if (ratio <= 0.2) return "bg-red-600"; // low availability
+    if (ratio <= 0.5) return "bg-yellow-600"; // medium
+    return "bg-green-600"; // high
+  };
 
   const getMarkerStyle = () => {
     const baseStyle = isMobile
-      ? "rounded px-1.5 py-0.5 text-xs shadow border min-w-[24px] text-center"
-      : "rounded-xl px-3 py-2 font-bold text-sm shadow-lg border-2 cursor-pointer transition-all duration-200 min-w-[50px] text-center";
+      ? "rounded-full px-2 py-1 text-[11px] shadow border min-w-[28px] text-center"
+      : "rounded-full px-3 py-2 font-bold text-sm shadow-lg border-2 cursor-pointer transition-all duration-200 min-w-[48px] text-center";
 
     if (isSelected) {
       return `${baseStyle} bg-blue-600 text-white border-blue-400 scale-110 z-50`;
     }
 
-    switch (parking.category) {
-      case 'best-value':
-        return `${baseStyle} bg-green-600 text-white border-green-400`;
-      case 'shortest-walk':
-        return `${baseStyle} bg-orange-600 text-white border-orange-400`;
-      case 'highest-rated':
-        return `${baseStyle} bg-purple-600 text-white border-purple-400`;
-      default:
-        return `${baseStyle} bg-white text-gray-800 border-gray-300`;
+    // Google spots (source !== 'backend') use a consistent blue.
+    if (parking.source !== 'backend') {
+      return `${baseStyle} bg-sky-600 text-white border-sky-300`;
     }
+
+    // Backend spots get a color based on availability.
+    const bg = getAvailabilityColor();
+    // Use a matching border color (slightly lighter).
+    const border = bg.replace('bg-', 'border-');
+    return `${baseStyle} ${bg} text-white ${border}`;
   };
 
   return (
@@ -48,19 +63,7 @@ function ParkingMarker({ parking, isSelected, onClick }: ParkingMarkerProps) {
       zIndex={isSelected ? 1000 : (parking.category ? 100 : 1)}
     >
       <div className={getMarkerStyle()}>
-        {parking.category && (
-          <div className="text-xs mb-1">
-            {parking.category === 'best-value' && 'Best Value'}
-            {parking.category === 'shortest-walk' && 'Shortest Walk'}
-            {parking.category === 'highest-rated' && 'Highest Rated'}
-          </div>
-        )}
-        <div>${parking.pricePerHour}</div>
-        {parking.availableSpots <= 3 && parking.availableSpots > 0 && (
-          <div className="text-xs text-red-200">
-            {parking.availableSpots} left
-          </div>
-        )}
+        <div>{markerLabel}</div>
       </div>
     </AdvancedMarker>
   );

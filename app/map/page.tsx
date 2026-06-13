@@ -56,16 +56,21 @@ export default function MapPage() {
 
   // FIXED: This function just sets selected parking - for sidebar detail view
   const handleParkingSelect = (parking: ParkingSpot | null) => {
-    if (parking && parking.id) {
-      setSelectedParking(parking);
+    if (!parking) return;
+    setSelectedParking(parking);
+
+    // Only recenter the map when the user selects a Google‑derived spot.
+    // Backend spots are already prioritized by distance and should not force the map
+    // to jump to a far‑away location when the user is searching elsewhere.
+    if (parking.source === 'google-cloud') {
       setCenter({ lat: parking.coordinates[1], lng: parking.coordinates[0] });
-      
-      // On mobile, switch to map view when selecting from list
-      if (isMobile && activeTab === 'list') {
-        setActiveTab('map');
-      }
-      // On desktop, selectedParking will trigger sidebar detail view automatically
     }
+
+    // On mobile, switch to map view when selecting from list
+    if (isMobile && activeTab === 'list') {
+      setActiveTab('map');
+    }
+    // On desktop, selectedParking will trigger sidebar detail view automatically
   };
 
   // FIXED: This function opens modal - only for carousel card taps

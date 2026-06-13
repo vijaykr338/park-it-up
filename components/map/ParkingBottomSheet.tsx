@@ -11,36 +11,6 @@ interface ParkingBottomSheetProps {
 export default function ParkingBottomSheet({ parking, onClose }: ParkingBottomSheetProps) {
   const fallbackImg = "/car_parking.svg";
 
-  const getAvailabilityColor = () => {
-    if (parking.availableSpots <= 3) return 'text-red-400';
-    if (parking.availableSpots <= 8) return 'text-orange-400';
-    return 'text-green-400';
-  };
-
-  const getAvailabilityText = () => {
-    if (parking.availableSpots <= 3) return `${parking.availableSpots} left`;
-    if (parking.availableSpots <= 8) return 'Limited availability';
-    return 'Available';
-  };
-
-  const getCategoryBadge = () => {
-    if (!parking.category) return null;
-    
-    const badges = {
-      'best-value': { label: 'Best Value', color: 'bg-green-600', icon: '💰' },
-      'shortest-walk': { label: 'Shortest Walk', color: 'bg-orange-600', icon: '🚶♂️' },
-      'highest-rated': { label: 'Highest Rated', color: 'bg-purple-600', icon: '⭐' }
-    };
-    
-    const badge = badges[parking.category];
-    return (
-      <div className={`${badge.color} text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1`}>
-        <span>{badge.icon}</span>
-        {badge.label}
-      </div>
-    );
-  };
-
   return (
     // Fixed: Proper positioning and z-index for bottom sheet
     <div className="fixed inset-0 z-[2000] flex items-end justify-center">
@@ -62,10 +32,7 @@ export default function ParkingBottomSheet({ parking, onClose }: ParkingBottomSh
 
         {/* Content */}
         <div className="p-6">
-          {/* Category Badge */}
-          <div className="mb-4">
-            {getCategoryBadge()}
-          </div>
+          <div className="mb-4" />
 
           {/* Parking Image */}
           <div className="mb-2">
@@ -101,20 +68,11 @@ export default function ParkingBottomSheet({ parking, onClose }: ParkingBottomSh
                   <span className="text-[#e2e8f0]">{parking.walkingTime} min</span>
                 </div>
               </div>
-              <div className={`font-medium ${getAvailabilityColor()}`}>
-                {getAvailabilityText()}
+              <div className="font-medium text-[#cbd5e1]">
+                {parking.source === 'backend'
+                  ? `${parking.availableSpots}/${parking.totalSpots || parking.availableSpots} slots`
+                  : 'Parking spot'}
               </div>
-            </div>
-
-            {/* Price */}
-            <div className="text-center py-4 border-t border-[#374151]">
-              <div className="text-3xl font-bold text-[#e2e8f0]">
-                ${parking.pricePerHour}
-                <span className="text-lg text-[#9ca3af] font-normal">/hour</span>
-              </div>
-              <p className="text-sm text-[#9ca3af] mt-1">
-                Total price may vary based on duration
-              </p>
             </div>
           </div>
         </div>

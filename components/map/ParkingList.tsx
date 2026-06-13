@@ -53,9 +53,6 @@ export default function ParkingList({ places, onSelect, selectedId }: ParkingLis
                 {place.rating && (
                   <span className="text-[#f59e0b] font-medium">★ {place.rating}</span>
                 )}
-                {place.priceLevel && (
-                  <span className="text-[#10b981] font-medium">Price: {place.priceLevel}</span>
-                )}
               </div>
             </div>
           </div>
